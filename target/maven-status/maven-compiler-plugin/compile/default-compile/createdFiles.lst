@@ -1,0 +1,6 @@
+io/corexchain/exceptions/InvalidAddressException.class
+io/corexchain/SmartContractUtils.class
+io/corexchain/Issuer.class
+io/corexchain/PdfIssuer.class
+io/corexchain/JsonIssuer.class
+io/corexchain/App.class

@@ -82,12 +82,14 @@ public class PdfIssuer {
 
         RawTransactionManager transactionManager = new RawTransactionManager(web3j, this.wallet, 3305);
         CertificationRegistration smartContract = CertificationRegistration.load(this.smartContractAddress, web3j, transactionManager, gasProvider);
+        // TODO: Сүүгий энийг давдаг болгох
 //        if (!smartContract.isValid())
 //            throw new InvalidSmartContractException();
 
         BigInteger exDate = expireDate != null ? BigInteger.valueOf(expireDate.getTime()) : BigInteger.ZERO;
+        // TODO: Fix: java.lang.RuntimeException: Error processing transaction request: transaction underpriced
         TransactionReceipt tr = smartContract.addCertification(hashValue, id, exDate, "0", desc).send();
-        return tr.getStatus();
+        return tr.getTransactionHash();
     }
 
     public String issue(

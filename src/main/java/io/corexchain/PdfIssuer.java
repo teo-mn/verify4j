@@ -2,12 +2,15 @@ package io.corexchain;
 
 import io.corexchain.exceptions.InvalidAddressException;
 import io.corexchain.exceptions.InvalidSmartContractException;
+import io.nbc.contracts.CertificationRegistration;
 import io.nbc.contracts.Greeter;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.RawTransactionManager;
+import org.web3j.tx.gas.StaticGasProvider;
 import org.web3j.utils.Strings;
 
 import org.web3j.crypto.Credentials;
@@ -22,18 +25,32 @@ import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 public class PdfIssuer {
-    private String keyStoreFile;
-    private String passPhrase;
     private String smartContractAddress;
     private String issuerAddress;
     private String issuerName;
     private String nodeHost;
     private Credentials wallet;
-    private DefaultGasProvider gasProvider;
+    private StaticGasProvider gasProvider;
+
+    public PdfIssuer(String privateKey,
+                     String smartContractAddress,
+                     String issuerAddress,
+                     String issuerName,
+                     String nodeHost){
+        this.smartContractAddress = smartContractAddress;
+        this.issuerAddress = issuerAddress;
+        this.issuerName = issuerName;
+        this.nodeHost = nodeHost;
+        this.wallet = Credentials.create(privateKey);
+        this.gasProvider = new StaticGasProvider(BigInteger.valueOf(3000000L), BigInteger.valueOf(3000000L));
+    }
 
     public PdfIssuer(String keyStoreFile,
                      String passPhrase,
@@ -41,14 +58,12 @@ public class PdfIssuer {
                      String issuerAddress,
                      String issuerName,
                      String nodeHost) throws CipherException, IOException {
-        this.keyStoreFile = keyStoreFile;
-        this.passPhrase = passPhrase;
         this.smartContractAddress = smartContractAddress;
         this.issuerAddress = issuerAddress;
         this.issuerName = issuerName;
+        this.nodeHost = nodeHost;
         this.wallet = WalletUtils.loadCredentials(passPhrase, keyStoreFile);
-//        this.wallet = Credentials.create("<privateKey>");
-        DefaultGasProvider gasPrice = new DefaultGasProvider();
+        this.gasProvider = new StaticGasProvider(BigInteger.valueOf(1000000L), BigInteger.valueOf(2000000L));
     }
 
     public String issue(
@@ -65,15 +80,14 @@ public class PdfIssuer {
 
         Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
 
-        Greeter smartContract = Greeter.load(this.smartContractAddress, web3j, this.wallet, gasProvider);
-        if (!smartContract.isValid())
-            throw new InvalidSmartContractException();
+        RawTransactionManager transactionManager = new RawTransactionManager(web3j, this.wallet, 3305);
+        CertificationRegistration smartContract = CertificationRegistration.load(this.smartContractAddress, web3j, transactionManager, gasProvider);
+//        if (!smartContract.isValid())
+//            throw new InvalidSmartContractException();
 
-        smartContract.addCertification(hashValue, id, BigInteger.valueOf(expireDate.getTime()), "0", desc)
-                .send().getTransactionHash();
-
-
-        return null;
+        BigInteger exDate = expireDate != null ? BigInteger.valueOf(expireDate.getTime()) : BigInteger.ZERO;
+        TransactionReceipt tr = smartContract.addCertification(hashValue, id, exDate, "0", desc).send();
+        return tr.getStatus();
     }
 
     public String issue(

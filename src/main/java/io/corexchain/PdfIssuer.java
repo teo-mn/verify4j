@@ -1,103 +1,27 @@
 package io.corexchain;
 
-import io.corexchain.exceptions.AlreadyExistsException;
-import io.corexchain.exceptions.InvalidAddressException;
-import io.corexchain.exceptions.InvalidCreditAmountException;
-import io.corexchain.exceptions.InvalidSmartContractException;
-import io.nbc.contracts.CertificationRegistration;
-import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.RawTransactionManager;
-import org.web3j.tx.gas.StaticGasProvider;
 
-import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Date;
 
-public class PdfIssuer {
-    private String smartContractAddress;
-    private String issuerAddress;
-    private String issuerName;
-    private String nodeHost;
-    private Credentials wallet;
-    private long chainId = 1104;
-    private StaticGasProvider gasProvider;
+public class PdfIssuer extends Issuer {
 
-    private static BigInteger GAS_PRICE = BigInteger.valueOf((long) (1e12));
-    private static BigInteger GAS_LIMIT = BigInteger.valueOf(2000000L);
-
-    public PdfIssuer(String privateKey,
-                     String smartContractAddress,
-                     String issuerAddress,
-                     String issuerName,
-                     String nodeHost,
-                     long chainId) {
-        this.smartContractAddress = smartContractAddress;
-        this.issuerAddress = issuerAddress;
-        this.issuerName = issuerName;
-        this.nodeHost = nodeHost;
-        this.wallet = Credentials.create(privateKey);
-        this.gasProvider = new StaticGasProvider(GAS_PRICE, GAS_LIMIT);
-        this.chainId = chainId;
-    }
-    public PdfIssuer(String privateKey,
-                     String smartContractAddress,
-                     String issuerAddress,
-                     String issuerName,
-                     String nodeHost) {
-        this(privateKey, smartContractAddress, issuerAddress, issuerName, nodeHost, 1104);
+    public PdfIssuer(
+            String smartContractAddress,
+            String issuerAddress,
+            String issuerName,
+            String nodeHost,
+            long chainId) {
+        super(smartContractAddress, issuerAddress, issuerName, nodeHost, chainId);
     }
 
-    public PdfIssuer(String keyStoreFile,
-                     String passPhrase,
-                     String smartContractAddress,
-                     String issuerAddress,
-                     String issuerName,
-                     String nodeHost) throws CipherException, IOException {
-        this.smartContractAddress = smartContractAddress;
-        this.issuerAddress = issuerAddress;
-        this.issuerName = issuerName;
-        this.nodeHost = nodeHost;
-        this.wallet = WalletUtils.loadCredentials(passPhrase, keyStoreFile);
-        this.gasProvider = new StaticGasProvider(GAS_PRICE, GAS_LIMIT);
-    }
-
-    public String issue(
-            String id,
-            String hashValue,
-            Date expireDate,
-            String desc
-    ) throws Exception {
-        if (!WalletUtils.isValidAddress(this.issuerAddress))
-            throw new InvalidAddressException("Issuer wallet address is invalid.");
-
-        if (!WalletUtils.isValidAddress(this.smartContractAddress))
-            throw new InvalidAddressException("Smart contract address is invalid.");
-
-        Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
-
-        RawTransactionManager transactionManager = new RawTransactionManager(web3j, this.wallet, this.chainId);
-        CertificationRegistration smartContract = CertificationRegistration.load(this.smartContractAddress, web3j, transactionManager, gasProvider);
-        // TODO: Сүүгий энийг давдаг болгох
-//        if (!smartContract.isValid())
-//            throw new InvalidSmartContractException();
-
-        BigInteger creditBalance = smartContract.getCredit(this.issuerAddress).send();
-        if (creditBalance.compareTo(BigInteger.ZERO) == 0)
-            throw new InvalidCreditAmountException();
-
-        CertificationRegistration.Certification cert = smartContract.getCertification(hashValue).send();
-        if (cert.id.compareTo(BigInteger.ZERO) != 0)
-            throw new AlreadyExistsException();
-
-        BigInteger exDate = expireDate != null ? BigInteger.valueOf(expireDate.getTime()) : BigInteger.ZERO;
-        // TODO: Fix: java.lang.RuntimeException: Error processing transaction request: transaction underpriced
-        TransactionReceipt tr = smartContract.addCertification(hashValue, id, exDate, "0", desc).send();
-        return tr.getTransactionHash();
+    public PdfIssuer(
+            String smartContractAddress,
+            String issuerAddress,
+            String issuerName,
+            String nodeHost) {
+        super(smartContractAddress, issuerAddress, issuerName, nodeHost, 1104);
     }
 
     public String issue(
@@ -105,8 +29,37 @@ public class PdfIssuer {
             String sourceFilePath,
             String destinationFilePath,
             Date expireDate,
-            String desc
-    ) {
-        return null;
+            String desc,
+            String privateKey
+    ) throws Exception {
+        Credentials wallet = Credentials.create(privateKey);
+        return this.issue(id, sourceFilePath, destinationFilePath, expireDate, desc, wallet);
+    }
+
+    private String issue(
+            String id,
+            String sourceFilePath,
+            String destinationFilePath,
+            Date expireDate,
+            String desc,
+            String keyStoreFile,
+            String passphrase
+    ) throws Exception {
+        Credentials wallet = WalletUtils.loadCredentials(passphrase, keyStoreFile);
+        return this.issue(id, sourceFilePath, destinationFilePath, expireDate, desc, wallet);
+    }
+
+    private String issue(
+            String id,
+            String sourceFilePath,
+            String destinationFilePath,
+            Date expireDate,
+            String desc,
+            Credentials wallet
+    ) throws Exception {
+
+
+
+        return this.issue(id, "hash", expireDate, desc, wallet);
     }
 }

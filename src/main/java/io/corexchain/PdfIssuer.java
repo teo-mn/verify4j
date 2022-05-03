@@ -3,6 +3,7 @@ package io.corexchain;
 import io.corexchain.exceptions.AlreadyExistsException;
 import io.corexchain.exceptions.InvalidAddressException;
 import io.corexchain.exceptions.InvalidCreditAmountException;
+import io.corexchain.exceptions.InvalidSmartContractException;
 import io.nbc.contracts.CertificationRegistration;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
@@ -23,22 +24,32 @@ public class PdfIssuer {
     private String issuerName;
     private String nodeHost;
     private Credentials wallet;
+    private long chainId = 1104;
     private StaticGasProvider gasProvider;
 
-    private static BigInteger GAS_PRICE = BigInteger.valueOf(3000000L);
-    private static BigInteger GAS_LIMIT = BigInteger.valueOf(3000000L);
+    private static BigInteger GAS_PRICE = BigInteger.valueOf((long) (1e12));
+    private static BigInteger GAS_LIMIT = BigInteger.valueOf(2000000L);
 
     public PdfIssuer(String privateKey,
                      String smartContractAddress,
                      String issuerAddress,
                      String issuerName,
-                     String nodeHost) {
+                     String nodeHost,
+                     long chainId) {
         this.smartContractAddress = smartContractAddress;
         this.issuerAddress = issuerAddress;
         this.issuerName = issuerName;
         this.nodeHost = nodeHost;
         this.wallet = Credentials.create(privateKey);
         this.gasProvider = new StaticGasProvider(GAS_PRICE, GAS_LIMIT);
+        this.chainId = chainId;
+    }
+    public PdfIssuer(String privateKey,
+                     String smartContractAddress,
+                     String issuerAddress,
+                     String issuerName,
+                     String nodeHost) {
+        this(privateKey, smartContractAddress, issuerAddress, issuerName, nodeHost, 1104);
     }
 
     public PdfIssuer(String keyStoreFile,
@@ -68,19 +79,19 @@ public class PdfIssuer {
             throw new InvalidAddressException("Smart contract address is invalid.");
 
         Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
+        BigInteger currentGas = web3j.ethGasPrice().send().getGasPrice();
+        System.out.println(currentGas);
 
-        RawTransactionManager transactionManager = new RawTransactionManager(web3j, this.wallet, 3305);
+        RawTransactionManager transactionManager = new RawTransactionManager(web3j, this.wallet, this.chainId);
         CertificationRegistration smartContract = CertificationRegistration.load(this.smartContractAddress, web3j, transactionManager, gasProvider);
         // TODO: Сүүгий энийг давдаг болгох
 //        if (!smartContract.isValid())
 //            throw new InvalidSmartContractException();
 
-        // TODO: Сүүгий энийг зөв ажилдаг болгох
         BigInteger creditBalance = smartContract.getCredit(this.issuerAddress).send();
         if (creditBalance.compareTo(BigInteger.ZERO) == 0)
             throw new InvalidCreditAmountException();
 
-        // TODO: Сүүгий энийг зөв ажилдаг болгох
         CertificationRegistration.Certification cert = smartContract.getCertification(hashValue).send();
         if (cert.id.compareTo(BigInteger.ZERO) != 0)
             throw new AlreadyExistsException();

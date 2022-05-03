@@ -13,7 +13,7 @@ public class PdfIssuerTest extends TestCase {
                 "https://node-testnet.corexchain.io"
         );
         try {
-            Assert.assertEquals(pdfIssuer.issue("d20220501", "89995e30DAB8E3F9113e216EEB2f44f6B8eb5738", null, "test"), "1");
+            Assert.assertEquals("1", pdfIssuer.issue("d20220501", "89995e30DAB8E3F9113e216EEB2f44f6B8eb5749", null, "test"));
         } catch (Exception e) {
             e.printStackTrace();
         }

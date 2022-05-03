@@ -79,8 +79,6 @@ public class PdfIssuer {
             throw new InvalidAddressException("Smart contract address is invalid.");
 
         Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
-        BigInteger currentGas = web3j.ethGasPrice().send().getGasPrice();
-        System.out.println(currentGas);
 
         RawTransactionManager transactionManager = new RawTransactionManager(web3j, this.wallet, this.chainId);
         CertificationRegistration smartContract = CertificationRegistration.load(this.smartContractAddress, web3j, transactionManager, gasProvider);

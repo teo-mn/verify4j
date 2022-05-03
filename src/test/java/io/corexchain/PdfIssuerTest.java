@@ -10,7 +10,8 @@ public class PdfIssuerTest extends TestCase {
                 "0xcc546a88db1af7d250a2f20dee42ec436f99e075",
                 "0x89995e30DAB8E3F9113e216EEB2f44f6B8eb5730",
                 "test_user",
-                "https://node-testnet.corexchain.io"
+                "https://node-testnet.corexchain.io",
+                3305
         );
         try {
             Assert.assertEquals("1", pdfIssuer.issue("d20220501", "89995e30DAB8E3F9113e216EEB2f44f6B8eb5749", null, "test"));

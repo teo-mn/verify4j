@@ -1,5 +1,7 @@
 package io.corexchain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.web3j.crypto.Hash;
 
 import java.util.*;
@@ -37,11 +39,11 @@ public class ChainPointV2 extends MerkleTree {
         return CHAINPOINT_HASH_TYPES.get(this.hashType);
     }
 
-    public String getReceipt(int index, String sourceId) {
+    public String getReceipt(int index, String sourceId) throws JsonProcessingException {
         return this.getReceipt(index, sourceId, false);
     }
 
-    public String getReceipt(int index, String sourceId, boolean testNet) {
+    public String getReceipt(int index, String sourceId, boolean testNet) throws JsonProcessingException {
         String chainType = testNet ? "corex_testnet" : "corex";
         if (this.getReady()) {
             Map<String, Object> map = new HashMap<>();
@@ -55,8 +57,10 @@ public class ChainPointV2 extends MerkleTree {
             anchor.put("sourceId", sourceId);
             List<Object> anchors = new ArrayList<Object>();
             anchors.add(anchor);
-            map.put("anchor", anchors);
-            return map.toString();
+            map.put("anchors", anchors);
+
+            ObjectMapper mapper = new ObjectMapper();
+            return  mapper.writeValueAsString(map);
         }
         return null;
     }

@@ -1,18 +1,25 @@
 package io.corexchain;
 
 import io.corexchain.exceptions.AlreadyExistsException;
+import io.corexchain.exceptions.BlockchainNodeException;
 import io.corexchain.exceptions.InvalidAddressException;
 import io.corexchain.exceptions.InvalidCreditAmountException;
 import io.nbc.contracts.CertificationRegistration;
+import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tuples.generated.Tuple2;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.gas.StaticGasProvider;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 public class Issuer {
@@ -34,6 +41,16 @@ public class Issuer {
     }
 
     protected long chainId = 1104;
+
+    public String getHashType() {
+        return hashType;
+    }
+
+    public void setHashType(String hashType) {
+        this.hashType = hashType;
+    }
+
+    protected String hashType = "SHA-256";
 
     public Issuer(String smartContractAddress,
                   String issuerAddress,
@@ -59,34 +76,34 @@ public class Issuer {
         this.gasProvider = new StaticGasProvider(GAS_PRICE, GAS_LIMIT);
     }
 
-    public String issue(
+    public Tuple2<String, String> issue(
             String id,
             String hashValue,
             Date expireDate,
             String desc,
             String keyStoreFile,
             String passphrase
-    ) throws Exception {
+    ) throws IOException, CipherException, NoSuchAlgorithmException {
         Credentials wallet = WalletUtils.loadCredentials(passphrase, keyStoreFile);
         return this.issue(id, hashValue, expireDate, desc, wallet);
     }
 
-    public String issue(
+    public Tuple2<String, String> issue(
             String id,
             String hashValue,
             Date expireDate,
             String desc,
             String privateKey
-    ) throws Exception {
+    ) throws NoSuchAlgorithmException {
         Credentials wallet = Credentials.create(privateKey);
         return this.issue(id, hashValue, expireDate, desc, wallet);
     }
 
-    protected String issue(String id,
-                         String hashValue,
-                         Date expireDate,
-                         String desc,
-                         Credentials wallet) throws Exception {
+    protected Tuple2<String, String> issue(String id,
+                           String hashValue,
+                           Date expireDate,
+                           String desc,
+                           Credentials wallet) throws NoSuchAlgorithmException {
         if (!WalletUtils.isValidAddress(this.issuerAddress))
             throw new InvalidAddressException("Issuer wallet address is invalid.");
 
@@ -101,16 +118,30 @@ public class Issuer {
 //        if (!smartContract.isValid())
 //            throw new InvalidSmartContractException();
 
-        BigInteger creditBalance = smartContract.getCredit(this.issuerAddress).send();
-        if (creditBalance.compareTo(BigInteger.ZERO) == 0)
-            throw new InvalidCreditAmountException();
+        ChainPointV2 chainPointV2 = new ChainPointV2();
+        chainPointV2.addLeaf(new ArrayList<>(Collections.singleton(hashValue)));
+        chainPointV2.makeTree();
 
-        CertificationRegistration.Certification cert = smartContract.getCertification(hashValue).send();
-        if (cert.id.compareTo(BigInteger.ZERO) != 0)
-            throw new AlreadyExistsException();
+        String root = chainPointV2.getMerkleRoot();
 
-        BigInteger exDate = expireDate != null ? BigInteger.valueOf(expireDate.getTime()) : BigInteger.ZERO;
-        TransactionReceipt tr = smartContract.addCertification(hashValue, id, exDate, "0", desc).send();
-        return tr.getTransactionHash();
+        try {
+            BigInteger creditBalance = smartContract.getCredit(this.issuerAddress).send();
+            if (creditBalance.compareTo(BigInteger.ZERO) == 0)
+                throw new InvalidCreditAmountException();
+
+            CertificationRegistration.Certification cert = smartContract.getCertification(root).send();
+            if (cert.id.compareTo(BigInteger.ZERO) != 0)
+                throw new AlreadyExistsException();
+
+            BigInteger exDate = expireDate != null ? BigInteger.valueOf(expireDate.getTime()) : BigInteger.ZERO;
+            TransactionReceipt tr = smartContract.addCertification(root, id, exDate, "0", desc).send();
+            return new Tuple2<>("test", chainPointV2.getReceipt(0, tr.getTransactionHash(),
+                    this.chainId != 1104));
+        }
+        catch (AlreadyExistsException | InvalidCreditAmountException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new BlockchainNodeException();
+        }
     }
 }

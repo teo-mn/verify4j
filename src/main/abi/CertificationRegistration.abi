@@ -141,7 +141,7 @@
     ],
     "name": "chargeCredit",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {

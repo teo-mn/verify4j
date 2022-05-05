@@ -1,9 +1,6 @@
 package io.corexchain;
 
-import io.corexchain.exceptions.AlreadyExistsException;
-import io.corexchain.exceptions.BlockchainNodeException;
-import io.corexchain.exceptions.InvalidAddressException;
-import io.corexchain.exceptions.InvalidCreditAmountException;
+import io.corexchain.exceptions.*;
 import io.nbc.contracts.CertificationRegistration;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
@@ -31,6 +28,7 @@ public class Issuer {
     protected String issuerAddress;
     protected String issuerName;
     protected String nodeHost;
+    private ChainPointV2 chainPointV2;
 
     public long getChainId() {
         return chainId;
@@ -94,35 +92,20 @@ public class Issuer {
             Date expireDate,
             String desc,
             String privateKey
-    ) throws NoSuchAlgorithmException {
+    ) throws NoSuchAlgorithmException, IOException {
         Credentials wallet = Credentials.create(privateKey);
         return this.issue(id, hashValue, expireDate, desc, wallet);
     }
 
     protected Tuple2<String, String> issue(String id,
-                           String hashValue,
-                           Date expireDate,
-                           String desc,
-                           Credentials wallet) throws NoSuchAlgorithmException {
-        if (!WalletUtils.isValidAddress(this.issuerAddress))
-            throw new InvalidAddressException("Issuer wallet address is invalid.");
-
-        if (!WalletUtils.isValidAddress(this.smartContractAddress))
-            throw new InvalidAddressException("Smart contract address is invalid.");
+                                           String hashValue,
+                                           Date expireDate,
+                                           String desc,
+                                           Credentials wallet) throws NoSuchAlgorithmException, IOException {
 
         Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
-
-        RawTransactionManager transactionManager = new RawTransactionManager(web3j, wallet, this.chainId);
-        CertificationRegistration smartContract = CertificationRegistration.load(this.smartContractAddress, web3j, transactionManager, gasProvider);
-        // TODO: Сүүгий энийг давдаг болгох
-//        if (!smartContract.isValid())
-//            throw new InvalidSmartContractException();
-
-        ChainPointV2 chainPointV2 = new ChainPointV2();
-        chainPointV2.addLeaf(new ArrayList<>(Collections.singleton(hashValue)));
-        chainPointV2.makeTree();
-
-        String root = chainPointV2.getMerkleRoot();
+        CertificationRegistration smartContract = createSmartContractInstance(web3j, wallet);
+        String root = getChainPointRoot(hashValue);
 
         try {
             BigInteger creditBalance = smartContract.getCredit(this.issuerAddress).send();
@@ -135,13 +118,78 @@ public class Issuer {
 
             BigInteger exDate = expireDate != null ? BigInteger.valueOf(expireDate.getTime()) : BigInteger.ZERO;
             TransactionReceipt tr = smartContract.addCertification(root, id, exDate, "0", desc).send();
-            return new Tuple2<>("test", chainPointV2.getReceipt(0, tr.getTransactionHash(),
+            if (!tr.isStatusOK()) {
+                throw new BlockchainNodeException();
+            }
+            return new Tuple2<>(tr.getTransactionHash(), chainPointV2.getReceipt(0, tr.getTransactionHash(),
                     this.chainId != 1104));
-        }
-        catch (AlreadyExistsException | InvalidCreditAmountException ex) {
+        } catch (AlreadyExistsException | InvalidCreditAmountException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new BlockchainNodeException();
         }
+    }
+
+    public String revoke(String hashValue, String revokerName, String privateKey)
+            throws NoSuchAlgorithmException, IOException {
+        Credentials wallet = Credentials.create(privateKey);
+        return this.revoke(hashValue, revokerName, wallet);
+    }
+
+    public String revoke(String hashValue, String revokerName, String keyStoreFile, String passphrase)
+            throws IOException, CipherException, NoSuchAlgorithmException {
+        Credentials wallet = WalletUtils.loadCredentials(passphrase, keyStoreFile);
+        return this.revoke(hashValue, revokerName, wallet);
+    }
+
+    protected String revoke(String hashValue, String revokerName, Credentials wallet)
+            throws NoSuchAlgorithmException, IOException {
+        Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
+        CertificationRegistration smartContract = createSmartContractInstance(web3j, wallet);
+        String root = getChainPointRoot(hashValue);
+
+        try {
+            BigInteger creditBalance = smartContract.getCredit(this.issuerAddress).send();
+            if (creditBalance.compareTo(BigInteger.ZERO) == 0)
+                throw new InvalidCreditAmountException();
+
+            CertificationRegistration.Certification cert = smartContract.getCertification(root).send();
+            if (cert.id.compareTo(BigInteger.ZERO) == 0)
+                throw new NotFoundException();
+
+            TransactionReceipt tr = smartContract.revoke(root, revokerName).send();
+            if (!tr.isStatusOK()) {
+                throw new BlockchainNodeException();
+            }
+            return tr.getTransactionHash();
+        } catch (AlreadyExistsException | InvalidCreditAmountException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new BlockchainNodeException();
+        }
+    }
+
+    private CertificationRegistration createSmartContractInstance(Web3j web3j, Credentials wallet) throws IOException {
+        if (!WalletUtils.isValidAddress(this.issuerAddress))
+            throw new InvalidAddressException("Issuer wallet address is invalid.");
+
+        if (!WalletUtils.isValidAddress(this.smartContractAddress))
+            throw new InvalidAddressException("Smart contract address is invalid.");
+        RawTransactionManager transactionManager = new RawTransactionManager(web3j, wallet, this.chainId);
+        CertificationRegistration smartContract = CertificationRegistration.load(this.smartContractAddress, web3j,
+                transactionManager, gasProvider);
+        // TODO: Сүүгий энийг давдаг болгох
+//        if (!smartContract.isValid())
+//            throw new InvalidSmartContractException();
+
+        return smartContract;
+    }
+
+    private String getChainPointRoot(String hashValue) throws NoSuchAlgorithmException {
+        this.chainPointV2 = new ChainPointV2();
+        chainPointV2.addLeaf(new ArrayList<>(Collections.singleton(hashValue)));
+        chainPointV2.makeTree();
+
+        return chainPointV2.getMerkleRoot();
     }
 }

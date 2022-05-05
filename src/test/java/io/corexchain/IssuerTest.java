@@ -3,10 +3,11 @@ package io.corexchain;
 import junit.framework.TestCase;
 import org.junit.Assert;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 public class IssuerTest extends TestCase {
-    public void testIssue() throws NoSuchAlgorithmException {
+    public void testIssue() throws NoSuchAlgorithmException, IOException {
         Issuer pdfIssuer = new Issuer(
                 "0xcc546a88db1af7d250a2f20dee42ec436f99e075",
                 "0x89995e30DAB8E3F9113e216EEB2f44f6B8eb5730",

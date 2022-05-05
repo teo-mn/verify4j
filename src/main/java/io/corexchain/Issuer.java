@@ -4,6 +4,7 @@ import io.corexchain.exceptions.*;
 import io.nbc.contracts.CertificationRegistration;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Keys;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
@@ -14,7 +15,9 @@ import org.web3j.tx.gas.StaticGasProvider;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -110,25 +113,55 @@ public class Issuer {
         try {
             BigInteger creditBalance = smartContract.getCredit(this.issuerAddress).send();
             if (creditBalance.compareTo(BigInteger.ZERO) == 0)
-                throw new InvalidCreditAmountException();
+                throw new InvalidCreditAmountException("Not enough credit.");
 
             CertificationRegistration.Certification cert = smartContract.getCertification(root).send();
             if (cert.id.compareTo(BigInteger.ZERO) != 0)
-                throw new AlreadyExistsException();
+                throw new AlreadyExistsException("Certification hash already exists in smart contract.");
 
             BigInteger exDate = expireDate != null ? BigInteger.valueOf(expireDate.getTime()) : BigInteger.ZERO;
             TransactionReceipt tr = smartContract.addCertification(root, id, exDate, "0", desc).send();
             if (!tr.isStatusOK()) {
-                throw new BlockchainNodeException();
+                throw new BlockchainNodeException("Error occurred on blockchain.");
             }
             return new Tuple2<>(tr.getTransactionHash(), chainPointV2.getReceipt(0, tr.getTransactionHash(),
                     this.chainId != 1104));
-        } catch (AlreadyExistsException | InvalidCreditAmountException ex) {
+        } catch (AlreadyExistsException | InvalidCreditAmountException | BlockchainNodeException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new BlockchainNodeException();
+            throw new BlockchainNodeException(ex.getMessage());
         }
     }
+
+    public VerifyResult verify(String hashValue)
+            throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+        Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
+        Credentials dummyCredentials = Credentials.create(Keys.createEcKeyPair());
+        CertificationRegistration smartContract = createSmartContractInstance(web3j, dummyCredentials);
+
+        try {
+            CertificationRegistration.Certification cert = smartContract.getCertification(hashValue).send();
+            if (cert.id.compareTo(BigInteger.ZERO) != 0)
+                throw new NotFoundException("Hash not found in smart contract");
+            String state = "";
+            Date d = new Date(cert.expireDate.longValue() * 1000);
+            if (cert.expireDate.compareTo(BigInteger.ZERO) != 0 && d.before(new Date())) {
+                state = "EXPIRED";
+            }
+            else if (cert.isRevoked) {
+                state = "REVOKED";
+            } else {
+                state = "ISSUED";
+            }
+            return new VerifyResult(cert, "", state);
+        } catch (NotFoundException ex) {
+            throw ex;
+        }
+        catch (Exception e) {
+            throw new BlockchainNodeException(e.getMessage());
+        }
+    }
+
 
     public String revoke(String hashValue, String revokerName, String privateKey)
             throws NoSuchAlgorithmException, IOException {

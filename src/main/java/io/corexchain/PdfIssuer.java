@@ -20,6 +20,14 @@ public class PdfIssuer extends Issuer {
 
     public static String VERSION = "v1.0-java";
 
+    /**
+     * PDF файлын хашийг ухаалаг гэрээнд бүртгэх
+     * @param smartContractAddress ухаалаг гэрээний хаяг
+     * @param issuerAddress        илгээгч байгууллагын блокчэйний хаяг
+     * @param issuerName           илгээгч байгууллагын нэр
+     * @param nodeHost             блокчэйний нөүдний URL
+     * @param chainId              блокчэйн ID
+     */
     public PdfIssuer(
             String smartContractAddress,
             String issuerAddress,
@@ -28,7 +36,13 @@ public class PdfIssuer extends Issuer {
             long chainId) {
         super(smartContractAddress, issuerAddress, issuerName, nodeHost, chainId);
     }
-
+    /**
+     * PDF файлын хашийг ухаалаг гэрээнд бүртгэх
+     * @param smartContractAddress ухаалаг гэрээний хаяг
+     * @param issuerAddress        илгээгч байгууллагын блокчэйний хаяг
+     * @param issuerName           илгээгч байгууллагын нэр
+     * @param nodeHost             блокчэйний нөүдний URL
+     */
     public PdfIssuer(
             String smartContractAddress,
             String issuerAddress,
@@ -37,6 +51,17 @@ public class PdfIssuer extends Issuer {
         super(smartContractAddress, issuerAddress, issuerName, nodeHost, 1104);
     }
 
+    /**
+     * PDF файлын хашийг ухаалаг гэрээнд бүртгэх.
+     * Бүртгэсний дараа файлын мэтадата хэсэгт гүйлгээний мэдээлэл, chainpoint баталгаа зэргийг бичин хадгална
+     * @param id файлын ID /хоосон байж болно/
+     * @param sourceFilePath эх файлын зам
+     * @param destinationFilePath бүртгэсний дараа мета дата бичээд хадгалах файлын зам
+     * @param expireDate дуусах огноо /null байж болно/
+     * @param desc тайлбар
+     * @param privateKey нууц түлхүүр
+     * @return Блокчэйний гүйлгээний ID буцаана
+     */
     public String issue(
             String id,
             String sourceFilePath,
@@ -49,7 +74,19 @@ public class PdfIssuer extends Issuer {
         return this.issue(id, sourceFilePath, destinationFilePath, expireDate, desc, wallet);
     }
 
-    private String issue(
+    /**
+     * PDF файлын хашийг ухаалаг гэрээнд бүртгэх.
+     * Бүртгэсний дараа файлын мэтадата хэсэгт гүйлгээний мэдээлэл, chainpoint баталгаа зэргийг бичин хадгална
+     * @param id файлын ID /хоосон байж болно/
+     * @param sourceFilePath эх файлын зам
+     * @param destinationFilePath бүртгэсний дараа мета дата бичээд хадгалах файлын зам
+     * @param expireDate дуусах огноо /null байж болно/
+     * @param desc тайлбар
+     * @param keyStoreFile нууц түлхүүрийн encrypt хийгдсэн файлын зам
+     * @param passphrase   нууц түлхүүрийг сэргээх код
+     * @return Блокчэйний гүйлгээний ID буцаана
+     */
+    public String issue(
             String id,
             String sourceFilePath,
             String destinationFilePath,
@@ -96,6 +133,12 @@ public class PdfIssuer extends Issuer {
         return result.component1();
     }
 
+    /**
+     * Файл ухаалаг гэрээнд бүртгэгдсэн эсэхийг шалгана
+     * @param filePath issue хийсний дараа мэтадата бичигдсэн файлын зам
+     * @return Хэрэв ухаалаг гэрээнд бүртгэлтэй бол `state` нь EXPIRED, ISSUED, REVOKED-ийн аль нэг утгыг авна.
+     * `issuerName` нь бүртгэсэн байгууллагын нэр байна
+     */
     public VerifyResult verifyPdf(String filePath)
             throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         PdfUtils pdfUtils = new PdfUtils(filePath);
@@ -119,12 +162,26 @@ public class PdfIssuer extends Issuer {
         return result;
     }
 
+    /**
+     * Бүртгэсэн файлыг хүчингүй болгох
+     * @param filePath issue хийсний дараа мэтадата бичигдсэн файлын зам
+     * @param revokerName хүчингүй болгож буй хүний нэр
+     * @param privateKey нууц түлхүүр
+     * @return Блокчэйний гүйлгээний ID
+     */
     public String revokePdf(
             String filePath, String revokerName, String privateKey) throws NoSuchAlgorithmException, IOException {
         Credentials wallet = Credentials.create(privateKey);
         return this.revokePdf(filePath, revokerName, wallet);
     }
-
+    /**
+     * Бүртгэсэн файлыг хүчингүй болгох
+     * @param filePath issue хийсний дараа мэтадата бичигдсэн файлын зам
+     * @param revokerName хүчингүй болгож буй хүний нэр
+     * @param keyStoreFile нууц түлхүүрийн encrypt хийгдсэн файлын зам
+     * @param passphrase   нууц түлхүүрийг сэргээх код
+     * @return Блокчэйний гүйлгээний ID
+     */
     public String revokePdf(
             String filePath, String revokerName, String keyStoreFile, String passphrase)
             throws IOException, CipherException {

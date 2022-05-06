@@ -104,10 +104,7 @@ public class Issuer {
      * @param keyStoreFile нууц түлхүүрийн encrypt хийгдсэн файлын зам
      * @param passphrase   нууц түлхүүрийг сэргээх код
      * @return эхний утга блокчэйний гүйлгээний ID, 2 дахь утга chainpoint баталгаа.
-     * Chainpoint баталгааг ашиглаж verify хийх тул файлын мета дата зэрэг устхааргүй газар хадгалах хэрэгтэй,
-     * @throws IOException              keyStoreFile нээж чадаагүй бол гарна
-     * @throws CipherException          нууц түлхүүрийг сэргээж чадаагүй бол гарна
-     * @throws NoSuchAlgorithmException хаш хийх алгоритм олдоогүй бол гарна
+     * Chainpoint баталгааг ашиглаж verify хийх тул файлын мета дата зэрэг устхааргүй газар хадгалах хэрэгтэй
      */
     public Tuple2<String, String> issue(
             String id,
@@ -131,10 +128,7 @@ public class Issuer {
      * @param keyStoreFile нууц түлхүүрийн encrypt хийгдсэн файлын зам
      * @param passphrase   нууц түлхүүрийг сэргээх код
      * @return эхний утга блокчэйний гүйлгээний ID, 2 дахь утга chainpoint баталгаа.
-     * Chainpoint баталгааг ашиглаж verify хийх тул файлын мета дата зэрэг устхааргүй газар хадгалах хэрэгтэй,
-     * @throws IOException              keyStoreFile нээж чадаагүй бол гарна
-     * @throws CipherException          нууц түлхүүрийг сэргээж чадаагүй бол гарна
-     * @throws NoSuchAlgorithmException хаш хийх алгоритм олдоогүй бол гарна
+     * Chainpoint баталгааг ашиглаж verify хийх тул файлын мета дата зэрэг устхааргүй газар хадгалах хэрэгтэй
      */
     public Tuple2<String, String> issue(
             String id,
@@ -158,8 +152,7 @@ public class Issuer {
      * @param desc       тайлбар /хоосон байж болно/
      * @param privateKey нууц түлхүүр
      * @return эхний утга блокчэйний гүйлгээний ID, 2 дахь утга chainpoint баталгаа.
-     * Chainpoint баталгааг ашиглаж verify хийх тул файлын мета дата зэрэг устхааргүй газар хадгалах хэрэгтэй,
-     * @throws NoSuchAlgorithmException хаш хийх алгоритм олдоогүй бол гарна
+     * Chainpoint баталгааг ашиглаж verify хийх тул файлын мета дата зэрэг устхааргүй газар хадгалах хэрэгтэй
      */
     public Tuple2<String, String> issue(
             String id,
@@ -181,8 +174,7 @@ public class Issuer {
      * @param desc       тайлбар /хоосон байж болно/
      * @param privateKey нууц түлхүүр
      * @return эхний утга блокчэйний гүйлгээний ID, 2 дахь утга chainpoint баталгаа.
-     * Chainpoint баталгааг ашиглаж verify хийх тул файлын мета дата зэрэг устхааргүй газар хадгалах хэрэгтэй,
-     * @throws NoSuchAlgorithmException хаш хийх алгоритм олдоогүй бол гарна
+     * Chainpoint баталгааг ашиглаж verify хийх тул файлын мета дата зэрэг устхааргүй газар хадгалах хэрэгтэй
      */
     public Tuple2<String, String> issue(
             String id,
@@ -205,6 +197,7 @@ public class Issuer {
             add(hashValue);
         }}, expireDate, desc, wallet);
     }
+
 
     protected Tuple2<String, String> issue(String id,
                                            ArrayList<String> hashValues,
@@ -245,10 +238,6 @@ public class Issuer {
      * @param hashValue     хаш утга
      * @param chainPointStr issue хийх үед үүссэн chainpoint ийн баталгаа
      * @return Хэрэв ухаалаг гэрээнд бүртгэлтэй бол state нь EXPIRED, ISSUED, REVOKED-ийн аль нэг утгыг авна.
-     * @throws InvalidAlgorithmParameterException ()
-     * @throws NoSuchAlgorithmException           хаш хийх алгортм олдоогүй үед гарна
-     * @throws NoSuchProviderException            ()
-     * @throws IOException                        ()
      */
     public VerifyResult verify(String hashValue, String chainPointStr)
             throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {

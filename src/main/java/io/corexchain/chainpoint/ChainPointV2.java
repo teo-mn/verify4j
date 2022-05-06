@@ -1,8 +1,7 @@
-package io.corexchain;
+package io.corexchain.chainpoint;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.web3j.crypto.Hash;
 
 import java.util.*;
 

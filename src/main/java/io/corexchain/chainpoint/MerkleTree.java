@@ -1,14 +1,15 @@
-package io.corexchain;
+package io.corexchain.chainpoint;
 
 
 import org.bouncycastle.util.encoders.Hex;
-import org.web3j.tuples.generated.Tuple2;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MerkleTree {
     protected String hashType;
@@ -81,12 +82,12 @@ public class MerkleTree {
         this.setReady(true);
     }
 
-    public List<Tuple2<String, String>> getProof(Integer index) {
+    public List<Map<String, String>> getProof(Integer index) {
         if (this.levels == null || this.levels.isEmpty()
                 || !this.getReady() || this.leaves.size() <= index || index < 0) {
             return null;
         }
-        ArrayList<Tuple2<String, String>> proof = new ArrayList<>();
+        ArrayList<Map<String, String>> proof = new ArrayList<>();
         for (ArrayList<byte[]> currentLevel : this.levels) {
             if (currentLevel.size() - 1 == index && currentLevel.size() % 2 == 1) {
                 index = index / 2;
@@ -96,24 +97,26 @@ public class MerkleTree {
             int j = isRightNode ? index - 1 : index + 1;
             String siblingPos = isRightNode ? "left" : "right";
             String siblingValue = byteToString(currentLevel.get(j));
-            proof.add(new Tuple2<>(siblingPos, siblingValue));
+            Map<String, String> map = new HashMap<String, String>();
+            map.put(siblingPos, siblingValue);
+            proof.add(map);
             index = index / 2;
         }
         return proof;
     }
 
-    public boolean validateProof(List<Tuple2<String, String>> proof, String targetHash, String merkleRoot)
+    public boolean validateProof(List<Map<String, String>> proof, String targetHash, String merkleRoot)
             throws NoSuchAlgorithmException {
         if (proof.size() == 0) {
             return targetHash.equals(merkleRoot);
         }
         byte[] proofHash = stringToBytes(targetHash);
 
-        for (Tuple2<String, String> p : proof) {
-            if ("left".equals(p.component1())) {
-                proofHash = this.calcHash(concatArray(stringToBytes(p.component2()), proofHash));
+        for (Map<String, String> p : proof) {
+            if (p.containsKey("left")) {
+                proofHash = this.calcHash(concatArray(stringToBytes(p.get("left")), proofHash));
             } else {
-                proofHash = this.calcHash(concatArray(proofHash, stringToBytes(p.component2())));
+                proofHash = this.calcHash(concatArray(proofHash, stringToBytes(p.get("right"))));
             }
         }
         return merkleRoot.equals(byteToString(proofHash));
@@ -129,7 +132,7 @@ public class MerkleTree {
         ArrayList<byte[]> topLevel = this.levels.get(this.levels.size() - 1);
         for (int i = 0; i < topLevel.size(); i += 2) {
             if (i + 1 < topLevel.size()) {
-                newList.add(this.calcHash(concatArray(topLevel.get(i), topLevel.get(i+1))));
+                newList.add(this.calcHash(concatArray(topLevel.get(i), topLevel.get(i + 1))));
             } else {
                 newList.add(topLevel.get(i));
             }
@@ -149,9 +152,8 @@ public class MerkleTree {
     }
 
     public String byteToString(byte[] a) {
-        return new String(Hex.encode(a));
+        return new String(Hex.encode(a)).toLowerCase();
     }
-
 
 
     public String calcHash(String val) throws NoSuchAlgorithmException {

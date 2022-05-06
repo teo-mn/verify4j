@@ -1,5 +1,6 @@
 package io.corexchain;
 
+import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.cos.COSString;
@@ -23,6 +24,11 @@ public class PdfUtils {
     public void setMetaData(String key, String value) {
         COSDictionary object = (COSDictionary) pdf.getDocument().getTrailer().getDictionaryObject(COSName.INFO);
         object.setItem(key, new COSString(value));
+    }
+
+    public COSBase getMetaData(String key) {
+        COSDictionary object = (COSDictionary) pdf.getDocument().getTrailer().getDictionaryObject(COSName.INFO);
+        return object.getItem(key);
     }
 
     public String calcHash(String hashType) throws IOException, NoSuchAlgorithmException {

@@ -2,7 +2,7 @@ package io.corexchain;
 
 import io.nbc.contracts.CertificationRegistration;
 
-public class VerifyResult{
+public class VerifyResult {
     public String issuerName;
     public String state;
     public CertificationRegistration.Certification cert;

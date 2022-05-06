@@ -1,5 +1,6 @@
 package io.corexchain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.corexchain.chainpoint.ChainPointV2;
 import io.corexchain.chainpoint.ChainPointV2Schema;
@@ -258,7 +259,7 @@ public class Issuer {
             CertificationRegistration.Certification cert = smartContract.getCertification(root).send();
             if (cert.id.compareTo(BigInteger.ZERO) == 0)
                 throw new NotFoundException("Hash not found in smart contract");
-            String state = "";
+            String state;
             Date d = new Date(cert.expireDate.longValue() * 1000);
             if (cert.expireDate.compareTo(BigInteger.ZERO) != 0 && d.before(new Date())) {
                 state = "EXPIRED";
@@ -272,6 +273,55 @@ public class Issuer {
             throw ex;
         } catch (Exception e) {
             throw new BlockchainNodeException(e.getMessage());
+        }
+    }
+
+    /**
+     * Ухаалаг гэрээнд бүртгэгдсэн мэдээллийг merkleRoot утгаар нь авах
+     *
+     * @param merkleRoot merkleRoot
+     */
+    public CertificationRegistration.Certification getByMerkleRoot(String merkleRoot)
+            throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+        Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
+        Credentials dummyCredentials = Credentials.create(Keys.createEcKeyPair());
+        CertificationRegistration smartContract = createSmartContractInstance(web3j, dummyCredentials);
+
+        try {
+            CertificationRegistration.Certification cert = smartContract.getCertification(merkleRoot).send();
+            if (cert.id.compareTo(BigInteger.ZERO) == 0)
+                throw new NotFoundException();
+            return cert;
+        } catch (NotFoundException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new BlockchainNodeException();
+        }
+    }
+
+    /**
+     * Ухаалаг гэрээнд хичнээн кредит эзэмшиж байгааг шалгах
+     *
+     * @param address хэтэвчийн хаяг
+     * @return кредитийн тоо
+     */
+    public Integer getCreditNumber(String address)
+            throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+
+        if (!WalletUtils.isValidAddress(Keys.toChecksumAddress(address)))
+            throw new InvalidAddressException("Wallet address is invalid.");
+
+        Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
+        Credentials dummyCredentials = Credentials.create(Keys.createEcKeyPair());
+        CertificationRegistration smartContract = createSmartContractInstance(web3j, dummyCredentials);
+
+        try {
+            BigInteger cert = smartContract.getCredit(Keys.toChecksumAddress(address)).send();
+            return cert.intValue();
+        } catch (NotFoundException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new BlockchainNodeException();
         }
     }
 

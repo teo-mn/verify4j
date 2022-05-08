@@ -18,8 +18,6 @@ import java.util.Map;
 
 public class PdfIssuer extends Issuer {
 
-    public static String VERSION = "v1.0-java";
-
     /**
      * PDF файлын хашийг ухаалаг гэрээнд бүртгэх
      * @param smartContractAddress ухаалаг гэрээний хаяг

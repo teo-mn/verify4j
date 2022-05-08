@@ -1,6 +1,5 @@
 package io.corexchain;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.corexchain.chainpoint.ChainPointV2;
 import io.corexchain.chainpoint.ChainPointV2Schema;
@@ -26,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Issuer {
+    public static String VERSION = "v1.0-java";
     protected StaticGasProvider gasProvider;
 
     protected static BigInteger GAS_PRICE = BigInteger.valueOf((long) (1e12));
@@ -220,7 +220,7 @@ public class Issuer {
                 throw new AlreadyExistsException("Certification hash already exists in smart contract.");
 
             BigInteger exDate = expireDate != null ? BigInteger.valueOf(expireDate.getTime() / 1000) : BigInteger.ZERO;
-            TransactionReceipt tr = smartContract.addCertification(root, id, exDate, "0", desc).send();
+            TransactionReceipt tr = smartContract.addCertification(root, id, exDate, VERSION, desc).send();
             if (!tr.isStatusOK()) {
                 throw new BlockchainNodeException("Error occurred on blockchain.");
             }

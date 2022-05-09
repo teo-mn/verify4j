@@ -28,8 +28,6 @@ public class VerifyResult {
         this.issuer = issuer;
     }
 
-    private String state;
-
     public String getMetadata() {
         return metadata;
     }
@@ -38,6 +36,7 @@ public class VerifyResult {
         this.metadata = metadata;
     }
 
+    private String state;
     private String metadata;
     private CertificationRegistration.Certification cert;
     private CertificationRegistration.Issuer issuer;
@@ -47,6 +46,7 @@ public class VerifyResult {
         this.cert = cert;
         this.metadata = "";
     }
+
     public VerifyResult(CertificationRegistration.Certification cert,
                         CertificationRegistration.Issuer issuer, String state) {
         this.state = state;

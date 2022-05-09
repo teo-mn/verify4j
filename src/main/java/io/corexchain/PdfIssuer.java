@@ -112,6 +112,7 @@ public class PdfIssuer extends Issuer {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> issuer = new HashMap<>();
         Map<String, String> info = new HashMap<>();
+        Map<String, String> blockchain = new HashMap<>();
         Map<String, Object> verifymn = new HashMap<>();
 
         /*
@@ -126,7 +127,11 @@ public class PdfIssuer extends Issuer {
                    cerNum: "",
                    additionalInfo: ""
                },
-               version: ""
+               version: "",
+               blockchain: {
+                    network: "",
+                    smartContractAddress: ""
+               }
           }
          */
         issuer.put("name", this.issuerName);
@@ -136,8 +141,13 @@ public class PdfIssuer extends Issuer {
         info.put("certNum", id);
         info.put("desc", desc);
         info.put("additionalInfo", additionalInfo);
+
+        blockchain.put("network", this.chainId == 1104 ? "CorexMain" : "CorexTest");
+        blockchain.put("smartContractAddress", this.smartContractAddress);
+
         verifymn.put("issuer", issuer);
         verifymn.put("info", info);
+        verifymn.put("blockchain", blockchain);
         verifymn.put("version", VERSION);
 
         pdfUtils.setMetaData("verifymn", mapper.writeValueAsString(verifymn));
@@ -165,6 +175,7 @@ public class PdfIssuer extends Issuer {
 //                .replace("/CHAINPOINTSTART", "").replace("/CHAINPOINTEND", "");
 //        pdfUtils.setMetaData("chainpoint_proof", "");
         String hashValue = pdfUtils.calcHash(this.hashType);
+        System.out.println(hashValue);
         pdfUtils.close();
 
 

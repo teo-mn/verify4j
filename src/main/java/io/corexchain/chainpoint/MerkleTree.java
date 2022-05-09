@@ -108,7 +108,7 @@ public class MerkleTree {
     public boolean validateProof(List<Map<String, String>> proof, String targetHash, String merkleRoot)
             throws NoSuchAlgorithmException {
         if (proof.size() == 0) {
-            return targetHash.equals(merkleRoot);
+            return targetHash.toLowerCase().equals(merkleRoot);
         }
         byte[] proofHash = stringToBytes(targetHash);
 

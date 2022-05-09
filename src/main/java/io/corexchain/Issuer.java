@@ -268,7 +268,11 @@ public class Issuer {
             } else {
                 state = "ISSUED";
             }
-            return new VerifyResult(cert, "", state);
+            VerifyResult result = new VerifyResult(cert, state);
+
+            CertificationRegistration.Issuer issuer = smartContract.getIssuer(cert.issuer).send();
+            result.setIssuer(issuer);
+            return result;
         } catch (NotFoundException ex) {
             throw ex;
         } catch (Exception e) {

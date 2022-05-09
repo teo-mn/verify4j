@@ -18,8 +18,8 @@ public class PdfIssuerTest extends TestCase {
                 3305
         );
         Assert.assertEquals("test", pdfIssuer.issue("d20220501",
-                "/home/surenbayar/Downloads/30/106-real-test.pdf", "/home/surenbayar/Downloads/test2.pdf",
-                null, "test", "a737d20b2e2a001bbf54c7edfcbffb015b0e67924e20f561c238ddaad6c4ed0e"));
+                "/home/surenbayar/Downloads/30/107-real-test.pdf", "/home/surenbayar/Downloads/test2.pdf",
+                null, "test", "", "a737d20b2e2a001bbf54c7edfcbffb015b0e67924e20f561c238ddaad6c4ed0e"));
 //        Assert.assertEquals("6f5e2bd37d12d6ec24e41cadc375688d4cbb07cd048fc89e500e9cdcc20ab6c6", pdfIssuer.revoke("/home/surenbayar/Downloads/test.pdf",
 //                "test", "a737d20b2e2a001bbf54c7edfcbffb015b0e67924e20f561c238ddaad6c4ed0e"));
     }
@@ -33,7 +33,6 @@ public class PdfIssuerTest extends TestCase {
                 3305
         );
         VerifyResult result = pdfIssuer.verifyPdf("/home/surenbayar/Downloads/test2.pdf");
-        Assert.assertEquals("ISSUED", result.state);
-        Assert.assertEquals("test_user", result.issuerName);
+        Assert.assertEquals("ISSUED", result.getState());
     }
 }

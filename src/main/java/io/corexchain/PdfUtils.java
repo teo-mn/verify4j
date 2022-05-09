@@ -35,7 +35,7 @@ public class PdfUtils {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         pdf.save(byteArrayOutputStream);
         final MessageDigest digest = MessageDigest.getInstance(hashType);
-        return new String(Hex.encode(digest.digest(byteArrayOutputStream.toByteArray())));
+        return new String(Hex.encode(digest.digest(byteArrayOutputStream.toByteArray()))).toLowerCase();
     }
 
     public void save(String destinationFilePath) throws IOException {

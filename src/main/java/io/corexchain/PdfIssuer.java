@@ -1,7 +1,7 @@
 package io.corexchain;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.corexchain.chainpoint.ChainPointV2;
 import org.apache.pdfbox.cos.COSString;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
@@ -12,9 +12,7 @@ import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class PdfIssuer extends Issuer {
 
@@ -57,6 +55,7 @@ public class PdfIssuer extends Issuer {
      * @param destinationFilePath бүртгэсний дараа мета дата бичээд хадгалах файлын зам
      * @param expireDate дуусах огноо /null байж болно/
      * @param desc тайлбар
+     * @param additionalInfo мэтадата дээр орох нэмэлт мэдээлэл
      * @param privateKey нууц түлхүүр
      * @return Блокчэйний гүйлгээний ID буцаана
      */
@@ -66,10 +65,11 @@ public class PdfIssuer extends Issuer {
             String destinationFilePath,
             Date expireDate,
             String desc,
+            String additionalInfo,
             String privateKey
     ) throws Exception {
         Credentials wallet = Credentials.create(privateKey);
-        return this.issue(id, sourceFilePath, destinationFilePath, expireDate, desc, wallet);
+        return this.issue(id, sourceFilePath, destinationFilePath, expireDate, desc, additionalInfo, wallet);
     }
 
     /**
@@ -80,6 +80,7 @@ public class PdfIssuer extends Issuer {
      * @param destinationFilePath бүртгэсний дараа мета дата бичээд хадгалах файлын зам
      * @param expireDate дуусах огноо /null байж болно/
      * @param desc тайлбар
+     * @param additionalInfo мэтадата дээр орох нэмэлт мэдээлэл
      * @param keyStoreFile нууц түлхүүрийн encrypt хийгдсэн файлын зам
      * @param passphrase   нууц түлхүүрийг сэргээх код
      * @return Блокчэйний гүйлгээний ID буцаана
@@ -90,11 +91,12 @@ public class PdfIssuer extends Issuer {
             String destinationFilePath,
             Date expireDate,
             String desc,
+            String additionalInfo,
             String keyStoreFile,
             String passphrase
     ) throws IOException, CipherException, NoSuchAlgorithmException {
         Credentials wallet = WalletUtils.loadCredentials(passphrase, keyStoreFile);
-        return this.issue(id, sourceFilePath, destinationFilePath, expireDate, desc, wallet);
+        return this.issue(id, sourceFilePath, destinationFilePath, expireDate, desc, additionalInfo, wallet);
     }
 
     private String issue(
@@ -103,29 +105,48 @@ public class PdfIssuer extends Issuer {
             String destinationFilePath,
             Date expireDate,
             String desc,
+            String additionalInfo,
             Credentials wallet
     ) throws IOException, NoSuchAlgorithmException {
         PdfUtils pdfUtils = new PdfUtils(sourceFilePath);
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> issuer = new HashMap<>();
-        Map<String, Object> address = new HashMap<>();
-        Map<String, Object> metadata = new HashMap<>();
+        Map<String, String> issuer = new HashMap<>();
+        Map<String, String> info = new HashMap<>();
+        Map<String, Object> verifymn = new HashMap<>();
+
+        /*
+          verifymn: {
+               issuer: {
+                   name: "",
+                   address: ""
+               },
+               info: {
+                   name: "",
+                   desc: "",
+                   cerNum: "",
+                   additionalInfo: ""
+               },
+               version: ""
+          }
+         */
         issuer.put("name", this.issuerName);
-        address.put("address", this.issuerAddress);
-        issuer.put("identity", address);
+        issuer.put("address", this.issuerAddress);
 
-        metadata.put("name", this.issuerName);
-        metadata.put("certNum", id);
+        info.put("name", this.issuerName);
+        info.put("certNum", id);
+        info.put("desc", desc);
+        info.put("additionalInfo", additionalInfo);
+        verifymn.put("issuer", issuer);
+        verifymn.put("info", info);
+        verifymn.put("version", VERSION);
 
-        pdfUtils.setMetaData("issuer", mapper.writeValueAsString(issuer));
-        pdfUtils.setMetaData("metadata", mapper.writeValueAsString(metadata));
-        pdfUtils.setMetaData("chainpoint_proof", "");
-        pdfUtils.setMetaData("version", VERSION);
+        pdfUtils.setMetaData("verifymn", mapper.writeValueAsString(verifymn));
+//        pdfUtils.setMetaData("chainpoint_proof", "");
 
         String hash = pdfUtils.calcHash(this.hashType);
 
         Tuple2<String, String> result = this.issue(id, hash, expireDate, desc, wallet);
-        pdfUtils.setMetaData("chainpoint_proof", "/CHAINPOINTSTART" + result.component2() + "/CHAINPOINTEND");
+//        pdfUtils.setMetaData("chainpoint_proof", "/CHAINPOINTSTART" + result.component2() + "/CHAINPOINTEND");
         pdfUtils.save(destinationFilePath);
         pdfUtils.close();
         return result.component1();
@@ -140,23 +161,19 @@ public class PdfIssuer extends Issuer {
     public VerifyResult verifyPdf(String filePath)
             throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         PdfUtils pdfUtils = new PdfUtils(filePath);
-        String issuerStr = ((COSString) pdfUtils.getMetaData("issuer")).getString();
-        String chainPointStr = ((COSString) pdfUtils.getMetaData("chainpoint_proof")).getString()
-                .replace("/CHAINPOINTSTART", "").replace("/CHAINPOINTEND", "");
-
-        pdfUtils.setMetaData("chainpoint_proof", "");
+//        String chainPointStr = ((COSString) pdfUtils.getMetaData("chainpoint_proof")).getString()
+//                .replace("/CHAINPOINTSTART", "").replace("/CHAINPOINTEND", "");
+//        pdfUtils.setMetaData("chainpoint_proof", "");
         String hashValue = pdfUtils.calcHash(this.hashType);
         pdfUtils.close();
-        VerifyResult result = verify(hashValue, chainPointStr);
 
-        // parse metadata
-        ObjectMapper mapper = new ObjectMapper();
-        TypeReference<HashMap<String, Object>> typeRef
-                = new TypeReference<>() {
-        };
-        HashMap<String, Object> map = mapper.readValue(issuerStr, typeRef);
-        // set issuer name from metadata
-        result.issuerName = map.get("name").toString();
+
+        ChainPointV2 v2 = new ChainPointV2();
+        v2.addLeaf(new ArrayList<String>(Collections.singleton(hashValue)));
+        v2.makeTree();
+
+        VerifyResult result = verify(hashValue, v2.getReceipt(0, ""));
+        result.setMetadata(((COSString) pdfUtils.getMetaData("verifymn")).getString());
         return result;
     }
 
@@ -195,7 +212,7 @@ public class PdfIssuer extends Issuer {
             Credentials wallet
     ) throws IOException, NoSuchAlgorithmException {
         PdfUtils pdfUtils = new PdfUtils(filePath);
-        pdfUtils.setMetaData("chainpoint_proof", "");
+//        pdfUtils.setMetaData("chainpoint_proof", "");
         String hashValue = pdfUtils.calcHash(this.hashType);
         pdfUtils.close();
         return this.revoke(hashValue, revokerName, wallet);

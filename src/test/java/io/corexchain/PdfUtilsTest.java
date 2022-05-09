@@ -44,4 +44,19 @@ public class PdfUtilsTest extends TestCase {
                 pdfUtils2.calcHash("SHA-256"));
     }
 
+    public void testHash4() throws Exception {
+        PdfUtils pdfUtils = new PdfUtils("src/test/java/io/corexchain/test.pdf");
+
+        pdfUtils.setMetaData("chainpoint_proof", "");
+        pdfUtils.setMetaData("version", "1");
+        pdfUtils.setMetaData("metadata", "{\"name\": \"test\", \"certNum\": \"1\"}");
+        pdfUtils.setMetaData("issuer", "{\"name\": \"test\", \"identity\": {\"address\": \"0x89995e30DAB8E3F9113e216EEB2f44f6B8eb5730\"}}");
+        Assert.assertEquals("924bd7ca894c5b7805a812c6c7560a6e4879e8c885c13601123fdfd2b0678851",
+                pdfUtils.calcHash("SHA-256"));
+
+        pdfUtils.setMetaData("chainpoint_proof", "/CHAINPOINTSTART{\"@context\": \"https://w3id.org/chainpoint/v2\", \"type\": \"ChainpointSHA256v2\", \"targetHash\": \"924bd7ca894c5b7805a812c6c7560a6e4879e8c885c13601123fdfd2b0678851\", \"merkleRoot\": \"924bd7ca894c5b7805a812c6c7560a6e4879e8c885c13601123fdfd2b0678851\", \"proof\": [], \"anchors\": [{\"type\": \"CorexDataMain\", \"sourceId\": \"0x2675db34fd192222318cf5c33e3e13de15c50d4ec6bf4b55c4afa3a005f972e3\"}]}/CHAINPOINTEND");
+
+        pdfUtils.save("src/test/java/io/corexchain/test2.pdf");
+        pdfUtils.close();
+    }
 }

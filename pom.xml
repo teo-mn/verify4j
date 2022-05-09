@@ -9,13 +9,65 @@
   <version>1.0-SNAPSHOT</version>
 
   <name>issuer</name>
-  <url>https://corexchain.io</url>
+  <description>Issue certificates using blockchain and smart contract</description>
+  <url>https://github.com/corex-mn/verify4j</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>11</java.version>
     <web3j-maven-plugin.version>4.8.7</web3j-maven-plugin.version>
   </properties>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+  <scm>
+    <connection>scm:git:git://github.com/corex-mn/verify4j.git</connection>
+    <developerConnection>scm:git:ssh:github.com/corex-mn/verify4j.git</developerConnection>
+    <url>https://github.com/corex-mn/verify4j</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <name>Zoljargal Munkhjargal</name>
+      <email>zoljargal@ailab.mn</email>
+      <organization>io.corexchain</organization>
+      <organizationUrl>https://corexchain.io</organizationUrl>
+    </developer>
+    <developer>
+      <name>Surenbayar Doloonjin</name>
+      <email>surenbayar@ailab.mn</email>
+      <organization>io.corexchain</organization>
+      <organizationUrl>https://corexchain.io</organizationUrl>
+    </developer>
+    <developer>
+      <name>Enkhbold Mainbayar</name>
+      <email>enkhbold@corex.mn</email>
+      <organization>io.corexchain</organization>
+      <organizationUrl>https://corexchain.io</organizationUrl>
+    </developer>
+    <developer>
+      <name>Yondonrinchin Batsukh</name>
+      <email>yondonrinchin@ailab.mn</email>
+      <organization>io.corexchain</organization>
+      <organizationUrl>https://corexchain.io</organizationUrl>
+    </developer>
+  </developers>
 
   <dependencies>
     <dependency>
@@ -44,6 +96,56 @@
     </dependency>
 
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
@@ -96,6 +198,17 @@
         <configuration>
           <source>11</source>
           <target>11</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.7</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
 

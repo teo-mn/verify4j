@@ -371,6 +371,9 @@ public abstract class Issuer {
             if (cert.id.compareTo(BigInteger.ZERO) == 0)
                 throw new NotFoundException();
 
+            if (cert.isRevoked)
+                throw new AlreadyExistsException();
+
             TransactionReceipt tr = smartContract.revoke(root, revokerName).send();
             if (!tr.isStatusOK()) {
                 throw new BlockchainNodeException();

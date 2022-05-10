@@ -18,6 +18,7 @@ public class PdfIssuer extends Issuer {
 
     /**
      * PDF файлын хашийг ухаалаг гэрээнд бүртгэх
+     *
      * @param smartContractAddress ухаалаг гэрээний хаяг
      * @param issuerAddress        илгээгч байгууллагын блокчэйний хаяг
      * @param issuerName           илгээгч байгууллагын нэр
@@ -32,8 +33,10 @@ public class PdfIssuer extends Issuer {
             long chainId) {
         super(smartContractAddress, issuerAddress, issuerName, nodeHost, chainId);
     }
+
     /**
      * PDF файлын хашийг ухаалаг гэрээнд бүртгэх
+     *
      * @param smartContractAddress ухаалаг гэрээний хаяг
      * @param issuerAddress        илгээгч байгууллагын блокчэйний хаяг
      * @param issuerName           илгээгч байгууллагын нэр
@@ -50,13 +53,14 @@ public class PdfIssuer extends Issuer {
     /**
      * PDF файлын хашийг ухаалаг гэрээнд бүртгэх.
      * Бүртгэсний дараа файлын мэтадата хэсэгт гүйлгээний мэдээлэл, chainpoint баталгаа зэргийг бичин хадгална
-     * @param id файлын ID /хоосон байж болно/
-     * @param sourceFilePath эх файлын зам
+     *
+     * @param id                  файлын ID /хоосон байж болно/
+     * @param sourceFilePath      эх файлын зам
      * @param destinationFilePath бүртгэсний дараа мета дата бичээд хадгалах файлын зам
-     * @param expireDate дуусах огноо /null байж болно/
-     * @param desc тайлбар
-     * @param additionalInfo мэтадата дээр орох нэмэлт мэдээлэл
-     * @param privateKey нууц түлхүүр
+     * @param expireDate          дуусах огноо /null байж болно/
+     * @param desc                тайлбар
+     * @param additionalInfo      мэтадата дээр орох нэмэлт мэдээлэл
+     * @param privateKey          нууц түлхүүр
      * @return Блокчэйний гүйлгээний ID буцаана
      */
     public String issue(
@@ -75,14 +79,15 @@ public class PdfIssuer extends Issuer {
     /**
      * PDF файлын хашийг ухаалаг гэрээнд бүртгэх.
      * Бүртгэсний дараа файлын мэтадата хэсэгт гүйлгээний мэдээлэл, chainpoint баталгаа зэргийг бичин хадгална
-     * @param id файлын ID /хоосон байж болно/
-     * @param sourceFilePath эх файлын зам
+     *
+     * @param id                  файлын ID /хоосон байж болно/
+     * @param sourceFilePath      эх файлын зам
      * @param destinationFilePath бүртгэсний дараа мета дата бичээд хадгалах файлын зам
-     * @param expireDate дуусах огноо /null байж болно/
-     * @param desc тайлбар
-     * @param additionalInfo мэтадата дээр орох нэмэлт мэдээлэл
-     * @param keyStoreFile нууц түлхүүрийн encrypt хийгдсэн файлын зам
-     * @param passphrase   нууц түлхүүрийг сэргээх код
+     * @param expireDate          дуусах огноо /null байж болно/
+     * @param desc                тайлбар
+     * @param additionalInfo      мэтадата дээр орох нэмэлт мэдээлэл
+     * @param keyStoreFile        нууц түлхүүрийн encrypt хийгдсэн файлын зам
+     * @param passphrase          нууц түлхүүрийг сэргээх код
      * @return Блокчэйний гүйлгээний ID буцаана
      */
     public String issue(
@@ -162,6 +167,7 @@ public class PdfIssuer extends Issuer {
 
     /**
      * Файл ухаалаг гэрээнд бүртгэгдсэн эсэхийг шалгана
+     *
      * @param filePath issue хийсний дараа мэтадата бичигдсэн файлын зам
      * @return Хэрэв ухаалаг гэрээнд бүртгэлтэй бол `state` нь EXPIRED, ISSUED, REVOKED-ийн аль нэг утгыг авна.
      * `issuerName` нь бүртгэсэн байгууллагын нэр байна
@@ -185,9 +191,10 @@ public class PdfIssuer extends Issuer {
 
     /**
      * Бүртгэсэн файлыг хүчингүй болгох
-     * @param filePath issue хийсний дараа мэтадата бичигдсэн файлын зам
+     *
+     * @param filePath    issue хийсний дараа мэтадата бичигдсэн файлын зам
      * @param revokerName хүчингүй болгож буй хүний нэр
-     * @param privateKey нууц түлхүүр
+     * @param privateKey  нууц түлхүүр
      * @return Блокчэйний гүйлгээний ID
      */
     public String revokePdf(
@@ -195,10 +202,12 @@ public class PdfIssuer extends Issuer {
         Credentials wallet = Credentials.create(privateKey);
         return this.revokePdf(filePath, revokerName, wallet);
     }
+
     /**
      * Бүртгэсэн файлыг хүчингүй болгох
-     * @param filePath issue хийсний дараа мэтадата бичигдсэн файлын зам
-     * @param revokerName хүчингүй болгож буй хүний нэр
+     *
+     * @param filePath     issue хийсний дараа мэтадата бичигдсэн файлын зам
+     * @param revokerName  хүчингүй болгож буй хүний нэр
      * @param keyStoreFile нууц түлхүүрийн encrypt хийгдсэн файлын зам
      * @param passphrase   нууц түлхүүрийг сэргээх код
      * @return Блокчэйний гүйлгээний ID

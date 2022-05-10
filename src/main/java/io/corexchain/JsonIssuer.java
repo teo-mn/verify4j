@@ -1,6 +1,5 @@
 package io.corexchain;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.corexchain.chainpoint.ChainPointV2;
 import io.corexchain.chainpoint.MerkleTree;
@@ -10,10 +9,7 @@ import org.web3j.crypto.WalletUtils;
 import org.web3j.tuples.generated.Tuple2;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -262,6 +258,13 @@ public class JsonIssuer extends Issuer {
         return this.revoke(hashValue, revokerName, wallet);
     }
 
+    /**
+     * Файл ухаалаг гэрээнд бүртгэгдсэн эсэхийг шалгана
+     *
+     * @param filePath issue хийсний дараа мэтадата бичигдсэн файлын зам
+     * @return Хэрэв ухаалаг гэрээнд бүртгэлтэй бол `state` нь EXPIRED, ISSUED, REVOKED-ийн аль нэг утгыг авна.
+     * `issuerName` нь бүртгэсэн байгууллагын нэр байна
+     */
     public VerifyResult verifyJson(String filePath) throws NoSuchAlgorithmException, IOException, NoSuchProviderException, InvalidAlgorithmParameterException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> json = mapper.readValue(new File(filePath), HashMap.class);

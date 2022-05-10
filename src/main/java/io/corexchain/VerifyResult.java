@@ -1,6 +1,6 @@
 package io.corexchain;
 
-import io.nbc.contracts.CertificationRegistration;
+import io.nbs.contracts.CertificationRegistration;
 
 public class VerifyResult {
 

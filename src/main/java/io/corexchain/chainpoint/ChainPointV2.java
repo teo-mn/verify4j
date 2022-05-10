@@ -46,7 +46,7 @@ public class ChainPointV2 extends MerkleTree {
         String chainType = testNet ? "corex_testnet" : "corex";
         if (this.getReady()) {
             Map<String, Object> map = new HashMap<>();
-            map.put("@context", CHAINPOINT_CONTEXT);
+            map.put("context", CHAINPOINT_CONTEXT);
             map.put("type", this.getChainPointHashType());
             map.put("targetHash", this.getLeaf(index));
             map.put("merkleRoot", this.getMerkleRoot());

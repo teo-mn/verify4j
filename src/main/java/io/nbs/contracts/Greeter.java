@@ -1,4 +1,4 @@
-package io.nbc.contracts;
+package io.nbs.contracts;
 
 import io.reactivex.Flowable;
 import java.math.BigInteger;

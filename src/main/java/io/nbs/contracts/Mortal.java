@@ -1,4 +1,4 @@
-package io.nbc.contracts;
+package io.nbs.contracts;
 
 import java.math.BigInteger;
 import java.util.Arrays;

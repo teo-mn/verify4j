@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.corexchain.chainpoint.ChainPointV2;
 import io.corexchain.chainpoint.ChainPointV2Schema;
 import io.corexchain.exceptions.*;
-import io.nbc.contracts.CertificationRegistration;
+import io.nbs.contracts.CertificationRegistration;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.Keys;
@@ -24,7 +24,7 @@ import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Issuer {
+public abstract class Issuer {
     public static String VERSION = "v1.0-java";
     protected StaticGasProvider gasProvider;
 

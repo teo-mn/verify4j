@@ -44,7 +44,7 @@ public class PdfIssuer extends Issuer {
             String issuerAddress,
             String issuerName,
             String nodeHost) {
-        super(smartContractAddress, issuerAddress, issuerName, nodeHost, 1104);
+        super(smartContractAddress, issuerAddress, issuerName, nodeHost);
     }
 
     /**
@@ -151,12 +151,10 @@ public class PdfIssuer extends Issuer {
         verifymn.put("version", VERSION);
 
         pdfUtils.setMetaData("verifymn", mapper.writeValueAsString(verifymn));
-//        pdfUtils.setMetaData("chainpoint_proof", "");
 
         String hash = pdfUtils.calcHash(this.hashType);
 
         Tuple2<String, String> result = this.issue(id, hash, expireDate, desc, wallet);
-//        pdfUtils.setMetaData("chainpoint_proof", "/CHAINPOINTSTART" + result.component2() + "/CHAINPOINTEND");
         pdfUtils.save(destinationFilePath);
         pdfUtils.close();
         return result.component1();
@@ -171,9 +169,6 @@ public class PdfIssuer extends Issuer {
     public VerifyResult verifyPdf(String filePath)
             throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         PdfUtils pdfUtils = new PdfUtils(filePath);
-//        String chainPointStr = ((COSString) pdfUtils.getMetaData("chainpoint_proof")).getString()
-//                .replace("/CHAINPOINTSTART", "").replace("/CHAINPOINTEND", "");
-//        pdfUtils.setMetaData("chainpoint_proof", "");
         String hashValue = pdfUtils.calcHash(this.hashType);
         System.out.println(hashValue);
         pdfUtils.close();
@@ -210,10 +205,10 @@ public class PdfIssuer extends Issuer {
      */
     public String revokePdf(
             String filePath, String revokerName, String keyStoreFile, String passphrase)
-            throws IOException, CipherException {
+            throws IOException, CipherException, NoSuchAlgorithmException {
 
         Credentials wallet = WalletUtils.loadCredentials(passphrase, keyStoreFile);
-        return this.revoke(filePath, revokerName, wallet);
+        return this.revokePdf(filePath, revokerName, wallet);
     }
 
 

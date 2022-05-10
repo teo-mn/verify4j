@@ -1,7 +1,5 @@
 package io.corexchain.chainpoint;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -57,7 +55,6 @@ public class ChainPointV2Schema {
     String targetHash;
     String merkleRoot;
     String type;
-    @JsonProperty("@context")
     String context;
     ArrayList<AnchorSchema> anchors;
     ArrayList<Map<String, String>> proof;

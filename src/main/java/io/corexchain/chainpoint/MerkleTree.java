@@ -167,4 +167,11 @@ public class MerkleTree {
         final MessageDigest digest = MessageDigest.getInstance(this.hashType);
         return digest.digest(val);
     }
+
+    public static String calcHashFromStr(String value, String hashType) throws NoSuchAlgorithmException {
+        final MessageDigest digest = MessageDigest.getInstance(hashType);
+        final byte[] hashbytes = digest.digest(
+                value.getBytes(StandardCharsets.UTF_8));
+        return  new String(Hex.encode(hashbytes)).toLowerCase();
+    }
 }

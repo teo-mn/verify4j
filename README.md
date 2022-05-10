@@ -11,7 +11,7 @@ Verify Issuer нь сертификат, диплом, дансны хуулга
 
 ## Суулгах заавар:
 Доорх dependency -ийг pom.xml дотор оруулах.
-```shell
+```xml
 <dependency>
     <groupId>io.corexchain</groupId>
     <artifactId>issuer</artifactId>
@@ -48,7 +48,7 @@ PDF файлын хаш утгыг тооцож ухаалаг гэрээнд б
 
 
 Метадата дээр бичигдэх өгөгдлийн хэлбэр:
-```shell
+```json
 verifymn: {
     issuer: {
         name: "",
@@ -69,7 +69,7 @@ verifymn: {
 ```
 
 #### Жишээ
-```shell
+```java
 PdfIssuer pdfIssuer = new PdfIssuer(
                 "smartContractAddress",
                 "issuerAddress",
@@ -118,7 +118,7 @@ try {
 
 #### Жишээ
 
-```shell
+```java
 PdfIssuer pdfIssuer = new PdfIssuer(
                 "smartContractAddress",
                 "issuerAddress",
@@ -168,7 +168,7 @@ JSON файлын хаш утгыг тооцож ухаалаг гэрээнд �
 
 
 Метадата дээр бичигдэх өгөгдлийн хэлбэр:
-```shell
+```json
 verifymn: {
     issuer: {
         name: "",
@@ -189,7 +189,7 @@ verifymn: {
 ```
 
 #### Жишээ
-```shell
+```java
 JsonIssuer issuer = new JsonIssuer(
         "smartContractAddress",
         "issuerAddress",
@@ -237,7 +237,7 @@ try {
 
 
 #### Жишээ
-```shell
+```java
 JsonIssuer issuer = new JsonIssuer(
         "smartContractAdress",
         "issuerAddress",

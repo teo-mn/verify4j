@@ -35,4 +35,16 @@ public class PdfIssuerTest extends TestCase {
         VerifyResult result = pdfIssuer.verifyPdf("/home/surenbayar/Downloads/test2.pdf");
         Assert.assertEquals("ISSUED", result.getState());
     }
+
+    public void testRevoker() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
+        PdfIssuer pdfIssuer = new PdfIssuer(
+                "0xcc546a88db1af7d250a2f20dee42ec436f99e075",
+                "0x89995e30DAB8E3F9113e216EEB2f44f6B8eb5730",
+                "test_user",
+                "https://node-testnet.corexchain.io",
+                3305
+        );
+        String result = pdfIssuer.revokePdf("/home/surenbayar/Downloads/test2.pdf", "test", "a737d20b2e2a001bbf54c7edfcbffb015b0e67924e20f561c238ddaad6c4ed0e");
+        Assert.assertEquals("ISSUED", result);
+    }
 }

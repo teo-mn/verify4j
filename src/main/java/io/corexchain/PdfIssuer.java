@@ -175,15 +175,13 @@ public class PdfIssuer extends Issuer {
     public VerifyResult verifyPdf(String filePath)
             throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         PdfUtils pdfUtils = new PdfUtils(filePath);
-        String hashValue = pdfUtils.calcHash(this.hashType);
-        System.out.println(hashValue);
+        String hashValue = PdfUtils.calcHash(filePath, this.hashType);
         pdfUtils.close();
 
 
         ChainPointV2 v2 = new ChainPointV2();
         v2.addLeaf(new ArrayList<String>(Collections.singleton(hashValue)));
         v2.makeTree();
-
         VerifyResult result = verify(hashValue, v2.getReceipt(0, ""));
         result.setMetadata(((COSString) pdfUtils.getMetaData("verifymn")).getString());
         return result;
@@ -228,7 +226,7 @@ public class PdfIssuer extends Issuer {
     ) throws IOException, NoSuchAlgorithmException {
         PdfUtils pdfUtils = new PdfUtils(filePath);
 //        pdfUtils.setMetaData("chainpoint_proof", "");
-        String hashValue = pdfUtils.calcHash(this.hashType);
+        String hashValue = PdfUtils.calcHash(filePath, this.hashType);
         pdfUtils.close();
         return this.revoke(hashValue, revokerName, wallet);
     }

@@ -217,7 +217,7 @@ public abstract class Issuer {
 
             CertificationRegistration.Certification cert = smartContract.getCertification(root).send();
             if (cert.id.compareTo(BigInteger.ZERO) != 0)
-                throw new AlreadyExistsException("Certification hash already exists in smart contract.");
+                throw new AlreadyExistsException("Certification hash already existed in the smart contract.");
 
             BigInteger exDate = expireDate != null ? BigInteger.valueOf(expireDate.getTime() / 1000) : BigInteger.ZERO;
             TransactionReceipt tr = smartContract.addCertification(root, id, exDate, VERSION, desc).send();
@@ -258,7 +258,7 @@ public abstract class Issuer {
         try {
             CertificationRegistration.Certification cert = smartContract.getCertification(root).send();
             if (cert.id.compareTo(BigInteger.ZERO) == 0)
-                throw new NotFoundException("Hash not found in smart contract");
+                throw new NotFoundException("Hash not found in the smart contract");
             String state;
             Date d = new Date(cert.expireDate.longValue() * 1000);
             if (cert.expireDate.compareTo(BigInteger.ZERO) != 0 && d.before(new Date())) {

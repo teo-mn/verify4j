@@ -1,162 +1,249 @@
-# verify4j
-verify4j нь сертификат, диплом, дансны хуулга зэрэг бичиг баримтыг блокчэйн дээр
-баталгаажуулж өгөх https://github.com/corex-mn/certify-sc ухаалаг гэрээтэй харьцдаг java хэлний сан юм.
+# Verify Issuer
+Verify Issuer нь сертификат, диплом, дансны хуулга зэрэг бичиг баримтыг блокчэйн дээр
+баталгаажуулж өгөх https://github.com/corex-mn/certify-sc ухаалаг гэрээний java хэл дээрх сан юм.
 
-Ингэхдээ https://chainpoint.org/ ийн v2.0 стандартыг ашигласан.
+- Тестнет-тэй холбогдох нөүд: `https://node-testnet.corexchain.io`
+- Теснет дээрх ухаалаг гэрээний хаяг: `0xcc546a88db1af7d250a2f20dee42ec436f99e075`
 
-## Суулгах заавар
-`pip install certify-issuer`
 
-## Функцүүд
-### `issue`
-PDF файлын хаш утгыг тооцож ухаалаг гэрээнд бичээд, 
-гүйлгээний мэдээлэл болон нэмэлт мэдээллүүдийг файлын мэтадата дээр нэмэн шинэ файлд хадгална. 
+- Майннет-тэй холбогдох нөүд: `https://node.corexchain.io`
+- Майннет дээрх ухаалаг гэрээний хаяг: `0x5d305D8423c0f07bEaf15ba6a5264e0c88fC41B4`
 
-| Параметр       | Тайлбар                               |   Заавал эсэх |  
-| -------------  | -------------                         | ------------- | 
-| `src_path`       | PDF эх файлын зам                     | тийм          |
-| `dest_path`      | Мэтадата бичсэн PDF-ийг хадгалах зам  | тийм          |
-| `cert_num`       | Сертификатын дахин давхцахгүй дугаар  | үгүй          | 
-| `address`        | Баталгаажуулагчийн блокчэйн хаяг      | тийм          |
-| `issuer_name`    | Баталгаажуулагчийн нэр                | үгүй          | 
-| `expire_date`    | Дуусах хугацаа                        | үгүй          | 
-| `description`    | Тайлбар, нэмэлт мэдээлэл              | үгүй          |
-| `private_key`    | Баталгаажуулагчийн хувийн түлхүүр     | үгүй /keystore, passphrase өгөөгүй бол заавал/         |
-| `keystore`       | Хувийн түлхүүрийн keystore файл       | үгүй /private_key өгөөгүй бол заавал/           |
-| `passphrase`     | Хувийн түлхүүрийн passphrase файл     | үгүй /private_key өгөөгүй бол заавал/           |
-| `certify_address`| Ухаалаг гэрээний хаяг                 | тийм          | 
-| `node_url`       | Гүйлгээ хийх блокчэйний нөүдний хаяг  | тийм          |
-| `is_testnet`     | Тест орчинд ажиллаж буй бол True утга өгнө|үгүй /default=False/
+## Суулгах заавар:
+Доорх dependency -ийг pom.xml дотор оруулах.
+```shell
+<dependency>
+    <groupId>io.corexchain</groupId>
+    <artifactId>issuer</artifactId>
+    <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+
+## Классууд
+## `PdfIssuer`
+PDF файлын хаш утгыг тооцож ухаалаг гэрээнд бичээд, гүйлгээний мэдээлэл болон нэмэлт мэдээллүүдийг
+файлын мэтадата дээр нэмж шинэ файлд хадгална.
+
+Байгуулагчийн параметр:
+
+| Параметр                                  | Тайлбар                                               |   Заавал эсэх |  
+| -------------                             | -------------                                         | ------------- | 
+| `smartContractAddress`                    | ухаалаг гэрээний хаяг                                 | тийм          |
+| `issuerAddress`                           | илгээгч байгууллагын блокчэйний хаяг                  | тийм          |
+| `issuerName`                              | илгээгч байгууллагын нэр                              | тийм          | 
+| `nodeHost`                                | блокчэйн нөүдний URL                                  | тийм          |
+| `chainId`                                 | блокчэйн ID                                           | тийм          | 
+
+`Issue` функцийн параметр:
+
+| Параметр                                  | Тайлбар                                               |   Заавал эсэх |  
+| -------------                             | -------------                                         | ------------- | 
+| `id`                                      | файлын ID  /хоосон байж болно/                        | үгүй          | 
+| `sourceFilePath`                          | эх файлын зам                                         | тийм          |
+| `destinationFilePath`                     | бүртгэсний дараа мета дата бичээд хадгалах зам        | тийм          |
+| `expireDate`                              | дуусах огноо /null байж болно/                        | үгүй          |
+| `desc`                                    | тайлбар                                               | тийм          |
+| `additionalInfo`                          | мэтадата дээр орох нэмэлт мэдээлэл                    | тийм          | 
+| `privateKey`                              | хувийн түлхүүр                                        | тийм          |
+
+
+Метадата дээр бичигдэх өгөгдлийн хэлбэр:
+```shell
+verifymn: {
+    issuer: {
+        name: "",
+        address: ""
+    },
+    info: {
+        name: "",
+        desc: "",
+        cerNum: "",
+        additionalInfo: ""
+    },
+    version: "",
+    blockchain: {
+         network: "",
+         smartContractAddress: ""
+    }
+}
+```
 
 #### Жишээ
-```
-from certify_issuer import issuer
-try:
-    txid, error = issuer.issue(src_path='test.pdf',
-                               dest_path='test_result.pdf',
-                               cert_num='D00123123',
-                               address=MY_ADDRESS,
-                               issuer_name='Монгол Улсын Их Сургууль',
-                               expire_date=0,
-                               description='2022 оны хаврын улирлын төгсөлт',
-                               private_key=MY_PRIVATE_KEY,
-                               certify_address=CERTIFY_CONTRACT_ADDRESS,
-                               node_url='https://node.corexchain.io',
-                               is_testnet=False)
-    if error is not None:
-        print("Error: {}", error)
-    else
-        print("Success: {}", txid)
-except Exception as e:
-    print("Error: {}", e)
-```
-### `issue_by_hash`
-Хаш стрингийг шууд ухаалаг гэрээнд баталгаажуулаад  
+```shell
+PdfIssuer pdfIssuer = new PdfIssuer(
+                "smartContractAddress",
+                "issuerAddress",
+                "issuerName",
+                "nodeHost",
+                3305
+      );
 
-| Параметр       | Тайлбар                               |   Заавал эсэх |  
-| -------------  | -------------                         | ------------- | 
-| `hash_str`       | хаш утга                              | тийм          |
-| `cert_num`       | Сертификатын дахин давхцахгүй дугаар  | үгүй          | 
-| `address`        | Баталгаажуулагчийн блокчэйн хаяг      | тийм          |
-| `expire_date`    | Дуусах хугацаа                        | үгүй          | 
-| `description`    | Тайлбар, нэмэлт мэдээлэл              | үгүй          |
-| `private_key`    | Баталгаажуулагчийн хувийн түлхүүр     | үгүй /keystore, passphrase өгөөгүй бол заавал/         |
-| `keystore`       | Хувийн түлхүүрийн keystore файл       | үгүй /private_key өгөөгүй бол заавал/           |
-| `passphrase`     | Хувийн түлхүүрийн passphrase файл     | үгүй /private_key өгөөгүй бол заавал/           |
-| `certify_address`| Ухаалаг гэрээний хаяг                 | тийм          | 
-| `node_url`       | Гүйлгээ хийх блокчэйний нөүдний хаяг  | тийм          |
-| `is_testnet`     | Тест орчинд ажиллаж буй бол True утга өгнө|үгүй /default=False/
+String transactionID;
+try {
+    transactionID = pdfIssuer.issue(
+            "id",
+            "sourceFilePath",
+            "destinationFilePath",
+            "expireDate",
+            "desc",
+            "additionalInfo",
+            "privateKey"
+    );
+    System.out.printf("Success: %s", transactionID);
+
+} catch (Exception e) {
+    System.out.printf("Error: %s", e);
+}
+```
+
+## `verifyPdf`
+Блокчэйн дээр баталгаажсан PDF файлыг шалгах
+
+| Параметр                                  | Тайлбар                                               |   Заавал эсэх |  
+| -------------                             | -------------                                         | ------------- | 
+| `smartContractAddress`                    | ухаалаг гэрээний хаяг                                 | тийм          |
+| `issuerAddress`                           | илгээгч байгууллагын блокчэйний хаяг                  | тийм          |
+| `issuerName`                              | илгээгч байгууллагын нэр                              | тийм          | 
+| `nodeHost`                                | блокчэйн нөүдний URL                                  | тийм          |
+| `chainId`                                 | блокчэйн ID                                           | тийм          | 
+| `filePath`                                | мета дататай файлын зам                               | үгүй          | 
+
 
 #### Жишээ
-```
-from certify_issuer import issuer
-hash_str = some_hash_function(file_or_something)
-try:
-    (tx, proof), error = issuer.issue(
-                               hash_str='89995e30DAB8E3F9113e216EEB2f44f6B8eb5738',
-                               cert_num='D00123123',
-                               address=MY_ADDRESS,
-                               expire_date=0,
-                               description='2022 оны хаврын улирлын төгсөлт',
-                               private_key=MY_PRIVATE_KEY,
-                               certify_address=CERTIFY_CONTRACT_ADDRESS,
-                               node_url='https://node.corexchain.io',
-                               is_testnet=False)
-    if error is not None:
-        print("Error: {}", error)
-    else
-        print("Success: {} {}", tx, proof)
-except Exception as e:
-    print("Error: {}", e)
+
+```shell
+PdfIssuer pdfIssuer = new PdfIssuer(
+                "smartContractAddress",
+                "issuerAddress",
+                "issuerName",
+                "nodeHost",
+                3305
+      );
+     
+try {
+    VerifyResult result = pdfIssuer.verifyPdf("filePath");
+
+    System.out.printf("State: %s\n", result.getState());
+    System.out.printf("Issuer: %s\n", result.getIssuer());
+    System.out.printf("Meta-data: %s\n", result.getMetadata());
+    System.out.printf("Cert: %s", result.getCert());
+
+} catch (Exception e) {
+    System.out.printf("Error: %s", e);
+}
 ```
 
-### `revoke`
-Нэгэнт ухаалаг гэрээнд баталгаажсан PDF файлыг буцаан хүчингүй болгох функц
+## `JsonIssuer`
+JSON файлын хаш утгыг тооцож ухаалаг гэрээнд бичээд, гүйлгээний мэдээлэл болон нэмэлт мэдээллүүдийг
+файлын мэтадата дээр нэмж шинэ файлд хадгална.
 
-| Параметр       | Тайлбар                               |   Заавал эсэх |  
-| -------------  | -------------| ------------- |
-| `src_path`       | Мэтадата бичигдсэн PDF файлын зам     | тийм          |
-| `address`        | Баталгаажуулагчийн блокчэйн хаяг      | тийм          |
-| `revoker_name`   | Хүчингүй болгож буй хүний нэр         | тийм          | 
-| `private_key`    | Баталгаажуулагчийн хувийн түлхүүр     | үгүй /keystore, passphrase өгөөгүй бол заавал/         |
-| `keystore`       | Хувийн түлхүүрийн keystore файл       | үгүй /private_key өгөөгүй бол заавал/           |
-| `passphrase`     | Хувийн түлхүүрийн passphrase файл     | үгүй /private_key өгөөгүй бол заавал/           |
-| `certify_address`| Ухаалаг гэрээний хаяг                 | тийм          | 
-| `node_url`       | Гүйлгээ хийх блокчэйний нөүдний хаяг  | тийм          |
-| `is_testnet`     | Тест орчинд ажиллаж буй бол True утга өгнө|үгүй /default=False/
+Байгуулагчийн параметр:
+
+| Параметр                                  | Тайлбар                                               |   Заавал эсэх |  
+| -------------                             | -------------                                         | ------------- | 
+| `smartContractAddress`                    | ухаалаг гэрээний хаяг                                 | тийм          |
+| `issuerAddress`                           | илгээгч байгууллагын блокчэйний хаяг                  | тийм          |
+| `issuerName`                              | илгээгч байгууллагын нэр                              | тийм          | 
+| `nodeHost`                                | блокчэйн нөүдний URL                                  | тийм          |
+| `chainId`                                 | блокчэйн ID                                           | тийм          | 
+
+Функцийн параметр:
+
+| Параметр                                  | Тайлбар                                               |   Заавал эсэх |  
+| -------------                             | -------------                                         | ------------- | 
+| `id`                                      | файлын ID  /хоосон байж болно/                        | үгүй          | 
+| `sourceFilePath`                          | эх файлын зам                                         | тийм          |
+| `destinationFilePath`                     | бүртгэсний дараа мета дата бичээд хадгалах зам        | тийм          |
+| `expireDate`                              | дуусах огноо /null байж болно/                        | үгүй          |
+| `desc`                                    | тайлбар                                               | тийм          |
+| `additionalInfo`                          | мэтадата дээр орох нэмэлт мэдээлэл                    | тийм          | 
+| `privateKey`                              | хувийн түлхүүр                                        | тийм          |
+
+
+Метадата дээр бичигдэх өгөгдлийн хэлбэр:
+```shell
+verifymn: {
+    issuer: {
+        name: "",
+        address: ""
+    },
+    info: {
+        name: "",
+        desc: "",
+        cerNum: "",
+        additionalInfo: ""
+    },
+    version: "",
+    blockchain: {
+         network: "",
+         smartContractAddress: ""
+    }
+}
+```
 
 #### Жишээ
-```
-from certify_issuer import issuer
-try:
-    tx, error = issuer.revoke(
-                           src_path='test_result.pdf',
-                           address=MY_ADDRESS,
-                           revoker_name='Mr. Revoker'
-                           private_key=MY_PRIVATE_KEY,
-                           certify_address=CERTIFY_CONTRACT_ADDRESS,
-                           node_url='https://node.corexchain.io',
-                           is_testnet=False)
-    if error is not None:
-        print("Error: {}", error)
-    else
-        print("Success: {}", tx)
+```shell
+JsonIssuer issuer = new JsonIssuer(
+        "smartContractAddress",
+        "issuerAddress",
+        "issuerName",
+        "nodeHost",
+        3305
+    );
 
-except Exception as e:
-    print("Error: {}", e)
+String transactionID;
+try {
+    transactionID =  issuer.issue(
+            "id",
+            "sourceFilePath",
+            "destinationFilePath",
+            "expireDate",
+            "desc",
+            "additionalInfo",
+            "privateKey"
+    );
+    System.out.printf("Success: %s", transactionID);
+} catch (Exception e) {
+    System.out.printf("Error: %s", e);
+}
 ```
-### `revoke_by_hash`
-Нэгэнт ухаалаг гэрээнд баталгаажсан хаш утгыг буцаан хүчингүй болгох функц
 
-| Параметр       | Тайлбар                               |   Заавал эсэх |  
-| -------------  | -------------                         | ------------- | 
-| `hash_str`       | хаш                                   | тийм          |
-| `address`        | Баталгаажуулагчийн блокчэйн хаяг      | тийм          |
-| `revoker_name`   | Хүчингүй болгож буй хүний нэр         | тийм          | 
-| `private_key`    | Баталгаажуулагчийн хувийн түлхүүр     | үгүй /keystore, passphrase өгөөгүй бол заавал/         |
-| `keystore`       | Хувийн түлхүүрийн keystore файл       | үгүй /private_key өгөөгүй бол заавал/           |
-| `passphrase`     | Хувийн түлхүүрийн passphrase файл     | үгүй /private_key өгөөгүй бол заавал/           |
-| `certify_address`| Ухаалаг гэрээний хаяг                 | тийм          | 
-| `node_url`       | Гүйлгээ хийх блокчэйний нөүдний хаяг  | тийм          |
-| `is_testnet`     | Тест орчинд ажиллаж буй бол True утга өгнө|үгүй /default=False/
+## `verifyJson`
+Блокчэйнд баталгаажуулсан JSON файлыг шалгах
+
+Функцийн параметр:
+
+| Параметр                                  | Тайлбар                                               |   Заавал эсэх |  
+| -------------                             | -------------                                         | ------------- | 
+| `smartContractAddress`                    | ухаалаг гэрээний хаяг                                 | тийм          |
+| `issuerAddress`                           | илгээгч байгууллагын блокчэйний хаяг                  | тийм          |
+| `issuerName`                              | илгээгч байгууллагын нэр                              | тийм          | 
+| `nodeHost`                                | блокчэйн нөүдний URL                                  | тийм          |
+| `chainId`                                 | блокчэйн ID                                           | тийм          | 
+
+
+Функцийн параметр:
+
+| Параметр                                  | Тайлбар                                               |   Заавал эсэх |  
+| -------------                             | -------------                                         | ------------- | 
+| `filePath`                                | мета дататай файлын зам                               | үгүй          | 
+
 
 #### Жишээ
-```
-from certify_issuer import issuer
-hash_str = some_hash_function(file_or_something)
-try:
-    tx, error = issuer.revoke_by_hash(
-                           hash_str=hash_str,
-                           address=MY_ADDRESS,
-                           revoker_name='Mr. Revoker'
-                           private_key=MY_PRIVATE_KEY,
-                           certify_address=CERTIFY_CONTRACT_ADDRESS,
-                           node_url='https://node.corexchain.io',
-                           is_testnet=False)
-    if error is not None:
-        print("Error: {}", error)
-    else
-        print("Success: {}", tx)
-except Exception as e:
-    print("Error: {}", e)
+```shell
+JsonIssuer issuer = new JsonIssuer(
+        "smartContractAdress",
+        "issuerAddress",
+        "issuerName",
+        "nodeHost",
+        3305
+    );
+
+try {
+    VerifyResult result = issuer.verifyJson("filePath");
+    System.out.printf("Result: %s", result.getState());
+
+} catch (Exception e) {
+    System.out.printf("Error: %s", e);
+}
 ```

@@ -224,6 +224,11 @@ public abstract class Issuer {
             if (!tr.isStatusOK()) {
                 throw new BlockchainNodeException("Error occurred on blockchain.");
             }
+            try {
+                smartContract.addTransactionId(root, tr.getTransactionHash()).sendAsync();
+            } catch (Exception ignored) {
+
+            }
             return new Tuple2<>(tr.getTransactionHash(), chainPointV2.getReceipt(0, tr.getTransactionHash(),
                     this.chainId != 1104));
         } catch (AlreadyExistsException | InvalidCreditAmountException | BlockchainNodeException ex) {

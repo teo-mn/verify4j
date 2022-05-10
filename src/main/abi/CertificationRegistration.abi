@@ -61,6 +61,24 @@
     "inputs": [
       {
         "internalType": "string",
+        "name": "_hash",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_txid",
+        "type": "string"
+      }
+    ],
+    "name": "addTransactionId",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
         "name": "",
         "type": "string"
       }
@@ -121,6 +139,11 @@
         "internalType": "uint256",
         "name": "revokedAt",
         "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -242,6 +265,11 @@
             "internalType": "uint256",
             "name": "revokedAt",
             "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "txid",
+            "type": "string"
           }
         ],
         "internalType": "struct CertificationRegistration.Certification",
@@ -318,6 +346,11 @@
             "internalType": "uint256",
             "name": "revokedAt",
             "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "txid",
+            "type": "string"
           }
         ],
         "internalType": "struct CertificationRegistration.Certification",
@@ -394,6 +427,11 @@
             "internalType": "uint256",
             "name": "revokedAt",
             "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "txid",
+            "type": "string"
           }
         ],
         "internalType": "struct CertificationRegistration.Certification",
@@ -474,6 +512,16 @@
             "internalType": "bool",
             "name": "isActive",
             "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "createdAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "updatedAt",
+            "type": "uint256"
           }
         ],
         "internalType": "struct SharedStructs.Issuer",
@@ -581,6 +629,11 @@
         "internalType": "uint256",
         "name": "revokedAt",
         "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -650,6 +703,11 @@
         "internalType": "uint256",
         "name": "revokedAt",
         "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "txid",
+        "type": "string"
       }
     ],
     "stateMutability": "view",

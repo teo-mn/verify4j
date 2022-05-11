@@ -48,7 +48,7 @@ PDF файлын хаш утгыг тооцож ухаалаг гэрээнд б
 
 
 Метадата дээр бичигдэх өгөгдлийн хэлбэр:
-```json
+```
 verifymn: {
     issuer: {
         name: "",
@@ -140,6 +140,65 @@ try {
 }
 ```
 
+#### Гаралтын формат
+```java
+public class VerifyResult {
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public CertificationRegistration.Certification getCert() {
+        return cert;
+    }
+
+    public void setCert(CertificationRegistration.Certification cert) {
+        this.cert = cert;
+    }
+
+    public CertificationRegistration.Issuer getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(CertificationRegistration.Issuer issuer) {
+        this.issuer = issuer;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
+    }
+
+    private String state;
+    private String metadata;
+    private CertificationRegistration.Certification cert;
+    private CertificationRegistration.Issuer issuer;
+
+    public VerifyResult(CertificationRegistration.Certification cert, String state) {
+        this.state = state;
+        this.cert = cert;
+        this.metadata = "";
+    }
+
+    public VerifyResult(CertificationRegistration.Certification cert,
+                        CertificationRegistration.Issuer issuer, String state) {
+        this.state = state;
+        this.cert = cert;
+        this.issuer = issuer;
+        this.metadata = "";
+    }
+}
+
+```
+state нь "ISSUED", "REVOKED", "EXPIRED" төлвүүдийн аль нэгийг авна. "ISSUED" нь хүчинтэй, "EXPIRED" нь хугацаа нь дууссан, "REVOKED" нь хүчингүй болгсон байна. cert утга нь сертификатын блокчэйн дээр бүртгэгдсэн мэдээлэл. issuer нь оруулсан байгууллагын мэдээлэл.
+
 ## `JsonIssuer`
 JSON файлын хаш утгыг тооцож ухаалаг гэрээнд бичээд, гүйлгээний мэдээлэл болон нэмэлт мэдээллүүдийг
 файлын мэтадата дээр нэмж шинэ файлд хадгална.
@@ -168,7 +227,7 @@ JSON файлын хаш утгыг тооцож ухаалаг гэрээнд �
 
 
 Метадата дээр бичигдэх өгөгдлийн хэлбэр:
-```json
+```
 verifymn: {
     issuer: {
         name: "",

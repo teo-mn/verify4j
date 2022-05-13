@@ -258,7 +258,6 @@ public class JsonIssuer extends Issuer {
         verifymn.remove("chainpointProof");
         json.put("verifymn", verifymn);
         String hashValue = MerkleTree.calcHashFromStr(jsonMapToString(json), this.hashType);
-        System.out.println(hashValue);
         return this.revoke(hashValue, revokerName, wallet);
     }
 
@@ -281,7 +280,6 @@ public class JsonIssuer extends Issuer {
         v2.addLeaf(new ArrayList<String>(Collections.singleton(hashValue)));
         v2.makeTree();
 
-        System.out.println(hashValue);
         VerifyResult result = verify(hashValue, v2.getReceipt(0, ""));
         result.setMetadata(metadata);
         return result;

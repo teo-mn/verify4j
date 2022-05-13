@@ -24,7 +24,7 @@ import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Issuer {
+public abstract class Issuer {
     public static String VERSION = "v1.0-java";
     protected StaticGasProvider gasProvider;
 

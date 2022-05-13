@@ -24,7 +24,7 @@ import java.security.NoSuchProviderException;
 import java.util.ArrayList;
 import java.util.Date;
 
-public abstract class Issuer {
+public class Issuer {
     public static String VERSION = "v1.0-java";
     protected StaticGasProvider gasProvider;
 
@@ -88,8 +88,8 @@ public abstract class Issuer {
                   String issuerAddress,
                   String issuerName,
                   String nodeHost) {
-        this.smartContractAddress = smartContractAddress;
-        this.issuerAddress = issuerAddress;
+        this.smartContractAddress = Keys.toChecksumAddress(smartContractAddress);
+        this.issuerAddress = Keys.toChecksumAddress(issuerAddress);
         this.issuerName = issuerName;
         this.nodeHost = nodeHost;
         this.gasProvider = new StaticGasProvider(GAS_PRICE, GAS_LIMIT);
@@ -384,7 +384,7 @@ public abstract class Issuer {
                 throw new BlockchainNodeException();
             }
             return tr.getTransactionHash();
-        } catch (AlreadyExistsException | InvalidCreditAmountException ex) {
+        } catch (AlreadyExistsException | InvalidCreditAmountException | NotFoundException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new BlockchainNodeException();

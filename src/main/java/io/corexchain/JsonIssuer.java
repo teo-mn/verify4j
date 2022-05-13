@@ -254,7 +254,11 @@ public class JsonIssuer extends Issuer {
     private String revokeJson(String filePath, String revokerName, Credentials wallet) throws IOException, NoSuchAlgorithmException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> json = mapper.readValue(new File(filePath), HashMap.class);
+        Map<String, Object> verifymn = (Map<String, Object>) json.get("verifymn");
+        verifymn.remove("chainpointProof");
+        json.put("verifymn", verifymn);
         String hashValue = MerkleTree.calcHashFromStr(jsonMapToString(json), this.hashType);
+        System.out.println(hashValue);
         return this.revoke(hashValue, revokerName, wallet);
     }
 
@@ -277,6 +281,7 @@ public class JsonIssuer extends Issuer {
         v2.addLeaf(new ArrayList<String>(Collections.singleton(hashValue)));
         v2.makeTree();
 
+        System.out.println(hashValue);
         VerifyResult result = verify(hashValue, v2.getReceipt(0, ""));
         result.setMetadata(metadata);
         return result;

@@ -1,0 +1,30 @@
+{
+    "string": "string test",
+    "number": 1,
+    "null": null,
+    "blank": "",
+    "blank_array": [],
+    "array2": [1, 2, "3"],
+    "array3": [1, 2, 3],
+    "array4": ["1", "2", "3"],
+    "array": [{
+        "string": "string test",
+        "number": 1,
+        "blank": "",
+        "blank_array": [],
+        "test": {
+            "test": 2,
+            "test2": "test2"
+        }
+    }],
+    "nested": {
+        "nested": {
+            "nested": {},
+            "number": 1,
+            "string": "saasda",
+            "blank": "",
+            "array": [],
+            "array2": [{}]
+        }
+    }
+}

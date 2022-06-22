@@ -14,7 +14,7 @@ Verify Issuer нь сертификат, диплом, дансны хуулга
 ```xml
 <dependency>
     <groupId>io.corexchain</groupId>
-    <artifactId>issuer</artifactId>
+    <artifactId>verify4j</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```

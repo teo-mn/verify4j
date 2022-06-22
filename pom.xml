@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.corexchain</groupId>
-  <artifactId>issuer</artifactId>
+  <artifactId>verify4j</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>issuer</name>
+  <name>verify4j</name>
   <description>Issue certificates using blockchain and smart contract</description>
   <url>https://github.com/corex-mn/verify4j</url>
 

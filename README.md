@@ -19,6 +19,18 @@ Verify Issuer нь сертификат, диплом, дансны хуулга
 </dependency>
 ```
 
+
+Доорх repository -ийг /m2/settings.xml дотор оруулах.
+```xml
+<repository>
+    <id>central-sona</id>
+    <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+    <releases>
+      <enabled>true</enabled>
+    </releases>
+</repository>
+```
+
 ## Классууд
 ## `PdfIssuer`
 PDF файлын хаш утгыг тооцож ухаалаг гэрээнд бичээд, гүйлгээний мэдээлэл болон нэмэлт мэдээллүүдийг

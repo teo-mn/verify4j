@@ -174,4 +174,12 @@ public class MerkleTree {
                 value.getBytes(StandardCharsets.UTF_8));
         return  new String(Hex.encode(hashbytes)).toLowerCase();
     }
+
+    public String mergeHash(String hash1, String hash2) throws NoSuchAlgorithmException {
+        byte[] hash1Bytes = Hex.decode(hash1);
+        byte[] hash2Bytes = Hex.decode(hash2);
+        byte[] result = this.concatArray(hash1Bytes, hash2Bytes);
+        byte[] resultHash = this.calcHash(result);
+        return byteToString(resultHash);
+    }
 }

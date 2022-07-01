@@ -42,6 +42,6 @@ public class JsonUtils {
         } else {
             result.append(data);
         }
-        return result.toString();
+        return result.toString().toLowerCase();
     }
 }

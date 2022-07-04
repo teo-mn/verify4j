@@ -66,49 +66,44 @@ public class DiplomaApprove {
     }
 
 
-    public boolean validateMetaData(String fileHash, String imageHash, DiplomaMetaDataDTO dto)
+    public boolean validateMetaData(String fileHash, String metaHash, DiplomaMetaDataDTO dto)
             throws NoSuchAlgorithmException {
-        return validateMetaData(fileHash, imageHash, dto.convertToMap());
+        return validateMetaData(fileHash, metaHash, dto.convertToMap());
     }
 
-    public boolean validateMetaData(String fileHash, String imageHash, Map<String, String> metaData)
+    public boolean validateMetaData(String fileHash, String metaHash, Map<String, String> metaData)
             throws NoSuchAlgorithmException {
-        String jsonStr = JsonUtils.jsonMapToString(metaData);
-        System.out.println(jsonStr);
-        MerkleTree mk = new MerkleTree();
-        String hashJson = mk.calcHash(jsonStr);
-        System.out.println(hashJson);
-        String mergedHash = mk.mergeHash(imageHash, hashJson);
-        System.out.println(mergedHash);
-        return fileHash.equals(mergedHash);
-    }
-
-    public String approve(String fileHash, String imageHash, DiplomaMetaDataDTO metaData, String privateKey) throws NoSuchAlgorithmException {
-        Credentials wallet = Credentials.create(privateKey);
-        return this.approve(fileHash, imageHash, metaData.convertToMap(), wallet);
-    }
-
-    public String approve(String fileHash, String imageHash, DiplomaMetaDataDTO metaData, String keyStoreFile, String passphrase) throws NoSuchAlgorithmException, IOException, CipherException {
-        Credentials wallet = WalletUtils.loadCredentials(passphrase, keyStoreFile);
-        return this.approve(fileHash, imageHash, metaData.convertToMap(), wallet);
-    }
-
-    public String approve(String fileHash, String imageHash, Map<String, String> metaData, String privateKey) throws NoSuchAlgorithmException {
-        Credentials wallet = Credentials.create(privateKey);
-        return this.approve(fileHash, imageHash, metaData, wallet);
-    }
-
-    public String approve(String fileHash, String imageHash, Map<String, String> metaData, String keyStoreFile, String passphrase) throws NoSuchAlgorithmException, IOException, CipherException {
-        Credentials wallet = WalletUtils.loadCredentials(passphrase, keyStoreFile);
-        return this.approve(fileHash, imageHash, metaData, wallet);
-    }
-
-    public String approve(String fileHash, String imageHash, Map<String, String> metaData, Credentials wallet) throws NoSuchAlgorithmException {
         String jsonStr = JsonUtils.jsonMapToString(metaData);
         MerkleTree mk = new MerkleTree();
         String hashJson = mk.calcHash(jsonStr);
-        String mergedHash = mk.mergeHash(imageHash, hashJson);
-        if (!fileHash.equals(mergedHash)) {
+        return hashJson.equals(metaHash);
+    }
+
+    public String approve(String fileHash, String metaHash, DiplomaMetaDataDTO metaData, String privateKey) throws NoSuchAlgorithmException, IOException {
+        Credentials wallet = Credentials.create(privateKey);
+        return this.approve(fileHash, metaHash, metaData.convertToMap(), wallet);
+    }
+
+    public String approve(String fileHash, String metaHash, DiplomaMetaDataDTO metaData, String keyStoreFile, String passphrase) throws NoSuchAlgorithmException, IOException, CipherException {
+        Credentials wallet = WalletUtils.loadCredentials(passphrase, keyStoreFile);
+        return this.approve(fileHash, metaHash, metaData.convertToMap(), wallet);
+    }
+
+    public String approve(String fileHash, String metaHash, Map<String, String> metaData, String privateKey) throws NoSuchAlgorithmException, IOException {
+        Credentials wallet = Credentials.create(privateKey);
+        return this.approve(fileHash, metaHash, metaData, wallet);
+    }
+
+    public String approve(String fileHash, String metaHash, Map<String, String> metaData, String keyStoreFile, String passphrase) throws NoSuchAlgorithmException, IOException, CipherException {
+        Credentials wallet = WalletUtils.loadCredentials(passphrase, keyStoreFile);
+        return this.approve(fileHash, metaHash, metaData, wallet);
+    }
+
+    public String approve(String fileHash, String metaHash, Map<String, String> metaData, Credentials wallet) throws NoSuchAlgorithmException, IOException {
+        String jsonStr = JsonUtils.jsonMapToString(metaData);
+        MerkleTree mk = new MerkleTree();
+        String hashJson = mk.calcHash(jsonStr);
+        if (!hashJson.equals(metaHash)) {
             throw new InvalidMetaDataException();
         }
         return approveUtil(fileHash, wallet);
@@ -125,6 +120,10 @@ public class DiplomaApprove {
             UniversityDiploma.Certification cert = smartContract.getCertification(fileHash).send();
             if (cert.id.compareTo(BigInteger.ZERO) == 0)
                 throw new NotFoundException();
+            UniversityDiploma.ApproveInfo info = smartContract.getApproveInfo(fileHash).send();
+            if (info.isApproved) {
+                throw new AlreadyExistsException();
+            }
             TransactionReceipt tr = smartContract.approve(fileHash).send();
             if (!tr.isStatusOK()) {
                 throw new BlockchainNodeException();
@@ -133,6 +132,7 @@ public class DiplomaApprove {
         } catch (InvalidCreditAmountException | NotFoundException ex) {
             throw ex;
         } catch (Exception ex) {
+            System.out.println(ex.toString());
             throw new BlockchainNodeException();
         }
 

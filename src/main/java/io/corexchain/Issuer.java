@@ -234,6 +234,7 @@ public abstract class Issuer {
         } catch (AlreadyExistsException | InvalidCreditAmountException | BlockchainNodeException ex) {
             throw ex;
         } catch (Exception ex) {
+            System.out.println(ex);
             throw new BlockchainNodeException(ex.getMessage());
         }
     }

@@ -71,9 +71,10 @@ public class DiplomaApprove {
         return validateMetaData(fileHash, metaHash, dto.convertToMap());
     }
 
-    public boolean validateMetaData(String fileHash, String metaHash, Map<String, String> metaData)
+    public boolean validateMetaData(String fileHash, String metaHash, Map<String, Object> metaData)
             throws NoSuchAlgorithmException {
         String jsonStr = JsonUtils.jsonMapToString(metaData);
+        System.out.println(jsonStr);
         MerkleTree mk = new MerkleTree();
         String hashJson = mk.calcHash(jsonStr);
         return hashJson.equals(metaHash);
@@ -89,17 +90,17 @@ public class DiplomaApprove {
         return this.approve(fileHash, metaHash, metaData.convertToMap(), wallet);
     }
 
-    public String approve(String fileHash, String metaHash, Map<String, String> metaData, String privateKey) throws NoSuchAlgorithmException, IOException {
+    public String approve(String fileHash, String metaHash, Map<String, Object> metaData, String privateKey) throws NoSuchAlgorithmException, IOException {
         Credentials wallet = Credentials.create(privateKey);
         return this.approve(fileHash, metaHash, metaData, wallet);
     }
 
-    public String approve(String fileHash, String metaHash, Map<String, String> metaData, String keyStoreFile, String passphrase) throws NoSuchAlgorithmException, IOException, CipherException {
+    public String approve(String fileHash, String metaHash, Map<String, Object> metaData, String keyStoreFile, String passphrase) throws NoSuchAlgorithmException, IOException, CipherException {
         Credentials wallet = WalletUtils.loadCredentials(passphrase, keyStoreFile);
         return this.approve(fileHash, metaHash, metaData, wallet);
     }
 
-    public String approve(String fileHash, String metaHash, Map<String, String> metaData, Credentials wallet) throws NoSuchAlgorithmException, IOException {
+    public String approve(String fileHash, String metaHash, Map<String, Object> metaData, Credentials wallet) throws NoSuchAlgorithmException, IOException {
         String jsonStr = JsonUtils.jsonMapToString(metaData);
         MerkleTree mk = new MerkleTree();
         String hashJson = mk.calcHash(jsonStr);

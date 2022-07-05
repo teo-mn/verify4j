@@ -74,7 +74,6 @@ public class DiplomaApprove {
     public boolean validateMetaData(String fileHash, String metaHash, Map<String, Object> metaData)
             throws NoSuchAlgorithmException {
         String jsonStr = JsonUtils.jsonMapToString(metaData);
-        System.out.println(jsonStr);
         MerkleTree mk = new MerkleTree();
         String hashJson = mk.calcHash(jsonStr);
         return hashJson.equals(metaHash);

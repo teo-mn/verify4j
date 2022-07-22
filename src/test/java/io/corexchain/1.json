@@ -2,6 +2,8 @@
     "string": "String Test",
     "number": 1,
     "null": null,
+    "boolean": true,
+    "boolean2": false,
     "blank": "",
     "blank_array": [],
     "array2": [1, 2, "3"],

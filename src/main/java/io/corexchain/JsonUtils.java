@@ -16,6 +16,8 @@ public class JsonUtils {
             result.append(data);
         } else if(data instanceof Double) {
             result.append(data);
+        } else if(data instanceof Boolean) {
+            result.append(data);
         } else if(data instanceof Float) {
             result.append(data);
         } else if(data instanceof List) {

@@ -49,6 +49,8 @@ public class PdfUtils {
         pdf.save(byteArrayOutputStream);
         FileOutputStream fos = new FileOutputStream(new File(destinationFilePath));
         byteArrayOutputStream.writeTo(fos);
+        fos.close();
+        byteArrayOutputStream.close();
     }
 
     public void close() throws IOException {

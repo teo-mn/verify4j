@@ -1,4 +1,4 @@
-package io.corexchain;
+package io.corexchain.verify4j;
 
 import org.apache.pdfbox.cos.COSBase;
 import org.apache.pdfbox.cos.COSDictionary;

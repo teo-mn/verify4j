@@ -1,9 +1,9 @@
-package io.corexchain;
+package io.corexchain.verify4j;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.corexchain.chainpoint.ChainPointV2;
-import io.corexchain.chainpoint.ChainPointV2Schema;
-import io.corexchain.exceptions.*;
+import io.corexchain.verify4j.chainpoint.ChainPointV2;
+import io.corexchain.verify4j.chainpoint.ChainPointV2Schema;
+import io.corexchain.verify4j.exceptions.*;
 import io.nbs.contracts.CertificationRegistration;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;

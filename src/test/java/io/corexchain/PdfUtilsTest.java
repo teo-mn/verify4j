@@ -1,5 +1,6 @@
 package io.corexchain;
 
+import io.corexchain.verify4j.PdfUtils;
 import junit.framework.TestCase;
 import org.junit.Assert;
 

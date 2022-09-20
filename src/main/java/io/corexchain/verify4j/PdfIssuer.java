@@ -1,7 +1,7 @@
-package io.corexchain;
+package io.corexchain.verify4j;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.corexchain.chainpoint.ChainPointV2;
+import io.corexchain.verify4j.chainpoint.ChainPointV2;
 import org.apache.pdfbox.cos.COSString;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;

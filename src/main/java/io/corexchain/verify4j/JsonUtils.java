@@ -1,4 +1,4 @@
-package io.corexchain;
+package io.corexchain.verify4j;
 
 import java.util.List;
 import java.util.Map;

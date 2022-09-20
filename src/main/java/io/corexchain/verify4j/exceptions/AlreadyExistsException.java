@@ -1,4 +1,4 @@
-package io.corexchain.exceptions;
+package io.corexchain.verify4j.exceptions;
 
 public class AlreadyExistsException extends RuntimeException {
     public AlreadyExistsException(){

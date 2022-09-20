@@ -1,7 +1,7 @@
-package io.corexchain;
+package io.corexchain.verify4j;
 
-import io.corexchain.chainpoint.MerkleTree;
-import io.corexchain.exceptions.*;
+import io.corexchain.verify4j.chainpoint.MerkleTree;
+import io.corexchain.verify4j.exceptions.*;
 import io.nbs.contracts.UniversityDiploma;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;

@@ -1,4 +1,4 @@
-package io.corexchain.chainpoint;
+package io.corexchain.verify4j.chainpoint;
 
 
 import org.bouncycastle.util.encoders.Hex;

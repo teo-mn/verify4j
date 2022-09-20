@@ -1,8 +1,8 @@
-package io.corexchain;
+package io.corexchain.verify4j;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.corexchain.chainpoint.ChainPointV2;
-import io.corexchain.chainpoint.MerkleTree;
+import io.corexchain.verify4j.chainpoint.ChainPointV2;
+import io.corexchain.verify4j.chainpoint.MerkleTree;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
@@ -15,7 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.*;
 
-import static io.corexchain.JsonUtils.jsonMapToString;
+import static io.corexchain.verify4j.JsonUtils.jsonMapToString;
 
 public class JsonIssuer extends Issuer {
 

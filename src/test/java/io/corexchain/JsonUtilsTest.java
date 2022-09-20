@@ -1,8 +1,8 @@
 package io.corexchain;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.corexchain.verify4j.JsonUtils;
 import junit.framework.TestCase;
-import org.junit.Assert;
 
 import java.io.File;
 import java.util.HashMap;

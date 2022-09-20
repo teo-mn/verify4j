@@ -3,11 +3,13 @@ Verify Issuer нь сертификат, диплом, дансны хуулга
 баталгаажуулж өгөх https://github.com/corex-mn/certify-sc ухаалаг гэрээний java хэл дээрх сан юм.
 
 - Тестнет-тэй холбогдох нөүд: `https://node-testnet.corexchain.io`
-- Теснет дээрх ухаалаг гэрээний хаяг: `0xcc546a88db1af7d250a2f20dee42ec436f99e075`
+- Тестнет дээрх ухаалаг гэрээний хаяг: `0xcc546a88db1af7d250a2f20dee42ec436f99e075`
+- Тестнэт chainId: 3305
 
 
 - Майннет-тэй холбогдох нөүд: `https://node.corexchain.io`
 - Майннет дээрх ухаалаг гэрээний хаяг: `0x5d305D8423c0f07bEaf15ba6a5264e0c88fC41B4`
+- Майннет chainId: 1104
 
 ## Суулгах заавар:
 Доорх dependency -ийг pom.xml дотор оруулах.
@@ -15,7 +17,7 @@ Verify Issuer нь сертификат, диплом, дансны хуулга
 <dependency>
     <groupId>io.corexchain</groupId>
     <artifactId>verify4j</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
 </dependency>
 ```
 

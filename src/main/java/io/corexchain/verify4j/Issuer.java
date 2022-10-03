@@ -36,6 +36,25 @@ public abstract class Issuer {
     protected String nodeHost;
     private ChainPointV2 chainPointV2;
 
+    protected int txMgrConfigAttempts = 100;
+    protected int txMgrConfigSleepDuration = 1000;
+
+    public void setTxMgrConfigAttempts(int value) {
+        this.txMgrConfigAttempts = value;
+    }
+
+    public int getTxMgrConfigAttempts() {
+        return this.txMgrConfigAttempts;
+    }
+
+    public void setTxMgrConfigSleepDuration(int value) {
+        this.txMgrConfigSleepDuration = value;
+    }
+
+    public int getTxMgrConfigSleepDuration() {
+        return this.txMgrConfigSleepDuration;
+    }
+
     public long getChainId() {
         return chainId;
     }
@@ -398,7 +417,8 @@ public abstract class Issuer {
 
         if (!WalletUtils.isValidAddress(this.smartContractAddress))
             throw new InvalidAddressException("Smart contract address is invalid.");
-        RawTransactionManager transactionManager = new RawTransactionManager(web3j, wallet, this.chainId);
+        RawTransactionManager transactionManager = new RawTransactionManager(web3j, wallet, this.chainId,
+                this.txMgrConfigAttempts, this.txMgrConfigSleepDuration);
         CertificationRegistration smartContract = CertificationRegistration.load(this.smartContractAddress, web3j,
                 transactionManager, gasProvider);
         try {

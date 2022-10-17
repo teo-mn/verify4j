@@ -37,7 +37,7 @@ public abstract class Issuer {
     private ChainPointV2 chainPointV2;
 
     protected int txMgrConfigAttempts = 100;
-    protected int txMgrConfigSleepDuration = 1000;
+    protected int txMgrConfigSleepDuration = 300;
 
     public void setTxMgrConfigAttempts(int value) {
         this.txMgrConfigAttempts = value;

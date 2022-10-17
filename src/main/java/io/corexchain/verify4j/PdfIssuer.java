@@ -113,6 +113,29 @@ public class PdfIssuer extends Issuer {
             String additionalInfo,
             Credentials wallet
     ) throws IOException, NoSuchAlgorithmException {
+        String hash = this.writeMetadata(id, sourceFilePath, destinationFilePath, desc, additionalInfo);
+        Tuple2<String, String> result = this.issue(id, hash, expireDate, desc, wallet);
+        return result.component1();
+    }
+
+
+    /**
+     * PDF файлын метадатаг блокчэйн дээр баталгаажуулахад зориулж өөрчлөх, хаш утгыг тооцоолох
+     *
+     * @param id                  файлын ID /хоосон байж болно/
+     * @param sourceFilePath      эх файлын зам
+     * @param destinationFilePath бүртгэсний дараа мета дата бичээд хадгалах файлын зам
+     * @param desc                тайлбар
+     * @param additionalInfo      мэтадата дээр орох нэмэлт мэдээлэл
+     * @return Файлын хаш утга буцаана
+     */
+    public String writeMetadata(
+            String id,
+            String sourceFilePath,
+            String destinationFilePath,
+            String desc,
+            String additionalInfo
+    ) throws IOException, NoSuchAlgorithmException {
         PdfUtils pdfUtils = new PdfUtils(sourceFilePath);
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> issuer = new HashMap<>();
@@ -158,11 +181,9 @@ public class PdfIssuer extends Issuer {
         pdfUtils.setMetaData("verifymn", mapper.writeValueAsString(verifymn));
 
         String hash = pdfUtils.calcHash(this.hashType);
-
-        Tuple2<String, String> result = this.issue(id, hash, expireDate, desc, wallet);
         pdfUtils.save(destinationFilePath);
         pdfUtils.close();
-        return result.component1();
+        return hash;
     }
 
     /**

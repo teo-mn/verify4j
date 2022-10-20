@@ -5,6 +5,7 @@ import io.corexchain.verify4j.chainpoint.ChainPointV2;
 import io.corexchain.verify4j.chainpoint.ChainPointV2Schema;
 import io.corexchain.verify4j.exceptions.*;
 import io.nbs.contracts.CertificationRegistration;
+import okhttp3.OkHttpClient;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.Keys;
@@ -17,7 +18,9 @@ import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.gas.StaticGasProvider;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.math.BigInteger;
+import java.net.SocketTimeoutException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -35,6 +38,8 @@ public abstract class Issuer {
     protected String issuerName;
     protected String nodeHost;
     private ChainPointV2 chainPointV2;
+
+    private OkHttpClient okHttpClient;
 
     protected int txMgrConfigAttempts = 100;
     protected int txMgrConfigSleepDuration = 300;
@@ -96,6 +101,29 @@ public abstract class Issuer {
     }
 
     /**
+     * @param smartContractAddress ухаалаг гэрээний хаяг
+     * @param issuerAddress        илгээгчийн хаяг
+     * @param issuerName           илгээгчийн нэр
+     * @param nodeHost             блокчэйний нөүдний URL
+     * @param chainId              блокчэйн ID
+     *
+     */
+    public Issuer(String smartContractAddress,
+                  String issuerAddress,
+                  String issuerName,
+                  String nodeHost,
+                  long chainId,
+                  OkHttpClient okHttpClient) {
+        this.smartContractAddress = Keys.toChecksumAddress(smartContractAddress);
+        this.issuerAddress = Keys.toChecksumAddress(issuerAddress);
+        this.issuerName = issuerName;
+        this.nodeHost = nodeHost;
+        this.gasProvider = new StaticGasProvider(GAS_PRICE, GAS_LIMIT);
+        this.chainId = chainId;
+        this.okHttpClient = okHttpClient;
+    }
+
+    /**
      * Verify хаш утгаар баталгаажуулагч
      *
      * @param smartContractAddress ухаалаг гэрээний хаяг
@@ -112,6 +140,28 @@ public abstract class Issuer {
         this.issuerName = issuerName;
         this.nodeHost = nodeHost;
         this.gasProvider = new StaticGasProvider(GAS_PRICE, GAS_LIMIT);
+    }
+
+    /**
+     * Verify хаш утгаар баталгаажуулагч
+     *
+     * @param smartContractAddress ухаалаг гэрээний хаяг
+     * @param issuerAddress        үүсгэгчийн хаяг
+     * @param issuerName           үүсгэгчийн нэр
+     * @param nodeHost             блокчэйний нөүдний URL
+     * @param okHttpClient         custom okHttpClient
+     */
+    public Issuer(String smartContractAddress,
+                  String issuerAddress,
+                  String issuerName,
+                  String nodeHost,
+                  OkHttpClient okHttpClient) {
+        this.smartContractAddress = Keys.toChecksumAddress(smartContractAddress);
+        this.issuerAddress = Keys.toChecksumAddress(issuerAddress);
+        this.issuerName = issuerName;
+        this.nodeHost = nodeHost;
+        this.gasProvider = new StaticGasProvider(GAS_PRICE, GAS_LIMIT);
+        this.okHttpClient = okHttpClient;
     }
 
     /**
@@ -180,7 +230,7 @@ public abstract class Issuer {
             Date expireDate,
             String desc,
             String privateKey
-    ) throws NoSuchAlgorithmException {
+    ) throws NoSuchAlgorithmException, SocketTimeoutException {
         Credentials wallet = Credentials.create(privateKey);
         return this.issue(id, hashValue, expireDate, desc, wallet);
     }
@@ -202,7 +252,7 @@ public abstract class Issuer {
             Date expireDate,
             String desc,
             String privateKey
-    ) throws NoSuchAlgorithmException {
+    ) throws NoSuchAlgorithmException, SocketTimeoutException {
         Credentials wallet = Credentials.create(privateKey);
         return this.issue(id, hashValues, expireDate, desc, wallet);
     }
@@ -212,7 +262,7 @@ public abstract class Issuer {
                                            Date expireDate,
                                            String desc,
                                            Credentials wallet)
-            throws NoSuchAlgorithmException {
+            throws NoSuchAlgorithmException, SocketTimeoutException {
         return this.issue(id, new ArrayList<>() {{
             add(hashValue);
         }}, expireDate, desc, wallet);
@@ -224,8 +274,8 @@ public abstract class Issuer {
                                            Date expireDate,
                                            String desc,
                                            Credentials wallet)
-            throws NoSuchAlgorithmException {
-        Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
+            throws NoSuchAlgorithmException, SocketTimeoutException {
+        Web3j web3j = this.getWeb3();
         CertificationRegistration smartContract = createSmartContractInstance(web3j, wallet);
         String root = getChainPointRoot(hashValues);
 
@@ -267,7 +317,7 @@ public abstract class Issuer {
      */
     public VerifyResult verify(String hashValue, String chainPointStr)
             throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, IOException {
-        Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
+        Web3j web3j = this.getWeb3();
         Credentials dummyCredentials = Credentials.create(Keys.createEcKeyPair());
         CertificationRegistration smartContract = createSmartContractInstance(web3j, dummyCredentials);
 
@@ -311,8 +361,8 @@ public abstract class Issuer {
      * @param merkleRoot merkleRoot
      */
     public CertificationRegistration.Certification getByMerkleRoot(String merkleRoot)
-            throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
-        Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
+            throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, SocketTimeoutException {
+        Web3j web3j = this.getWeb3();
         Credentials dummyCredentials = Credentials.create(Keys.createEcKeyPair());
         CertificationRegistration smartContract = createSmartContractInstance(web3j, dummyCredentials);
 
@@ -335,12 +385,12 @@ public abstract class Issuer {
      * @return кредитийн тоо
      */
     public Integer getCreditNumber(String address)
-            throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
+            throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, SocketTimeoutException {
 
         if (!WalletUtils.isValidAddress(Keys.toChecksumAddress(address)))
             throw new InvalidAddressException("Wallet address is invalid.");
 
-        Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
+        Web3j web3j = this.getWeb3();
         Credentials dummyCredentials = Credentials.create(Keys.createEcKeyPair());
         CertificationRegistration smartContract = createSmartContractInstance(web3j, dummyCredentials);
 
@@ -363,7 +413,7 @@ public abstract class Issuer {
      * @param privateKey  нууц түлхүүр
      * @return Блокчэйний гүйлгээний ID
      */
-    public String revoke(String merkleRoot, String revokerName, String privateKey) {
+    public String revoke(String merkleRoot, String revokerName, String privateKey) throws SocketTimeoutException {
         Credentials wallet = Credentials.create(privateKey);
         return this.revoke(merkleRoot, revokerName, wallet);
     }
@@ -382,8 +432,8 @@ public abstract class Issuer {
         return this.revoke(merkleRoot, revokerName, wallet);
     }
 
-    protected String revoke(String merkleRoot, String revokerName, Credentials wallet) {
-        Web3j web3j = Web3j.build(new HttpService(this.nodeHost));
+    protected String revoke(String merkleRoot, String revokerName, Credentials wallet) throws SocketTimeoutException {
+        Web3j web3j = this.getWeb3();
         CertificationRegistration smartContract = createSmartContractInstance(web3j, wallet);
         String root = merkleRoot.toLowerCase();
 
@@ -411,7 +461,7 @@ public abstract class Issuer {
         }
     }
 
-    private CertificationRegistration createSmartContractInstance(Web3j web3j, Credentials wallet) {
+    private CertificationRegistration createSmartContractInstance(Web3j web3j, Credentials wallet) throws SocketTimeoutException {
         if (!WalletUtils.isValidAddress(this.issuerAddress))
             throw new InvalidAddressException("Issuer wallet address is invalid.");
 
@@ -423,7 +473,12 @@ public abstract class Issuer {
                 transactionManager, gasProvider);
         try {
             smartContract.getCredit(this.issuerAddress).send();
-        } catch (Exception ex) {
+        } catch (SocketTimeoutException e) {
+            throw e;
+        } catch (InterruptedIOException e) {
+            throw new SocketTimeoutException(e.getMessage());
+        }
+        catch (Exception ex) {
             throw new InvalidSmartContractException();
         }
 
@@ -436,5 +491,15 @@ public abstract class Issuer {
         chainPointV2.makeTree();
 
         return chainPointV2.getMerkleRoot();
+    }
+
+    private Web3j getWeb3() {
+        Web3j web3j;
+        if (this.okHttpClient != null) {
+            web3j = Web3j.build(new HttpService(this.nodeHost, this.okHttpClient));
+        } else {
+            web3j = Web3j.build(new HttpService(this.nodeHost));
+        }
+        return web3j;
     }
 }

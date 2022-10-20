@@ -2,6 +2,7 @@ package io.corexchain.verify4j;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.corexchain.verify4j.chainpoint.ChainPointV2;
+import okhttp3.OkHttpClient;
 import org.apache.pdfbox.cos.COSString;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.Credentials;
@@ -24,6 +25,26 @@ public class PdfIssuer extends Issuer {
      * @param issuerName           илгээгч байгууллагын нэр
      * @param nodeHost             блокчэйний нөүдний URL
      * @param chainId              блокчэйн ID
+     * @param okHttpClient         Custom okHttpClient
+     */
+    public PdfIssuer(
+            String smartContractAddress,
+            String issuerAddress,
+            String issuerName,
+            String nodeHost,
+            long chainId,
+            OkHttpClient okHttpClient) {
+        super(smartContractAddress, issuerAddress, issuerName, nodeHost, chainId, okHttpClient);
+    }
+
+    /**
+     * PDF файлын хашийг ухаалаг гэрээнд бүртгэх
+     *
+     * @param smartContractAddress ухаалаг гэрээний хаяг
+     * @param issuerAddress        илгээгч байгууллагын блокчэйний хаяг
+     * @param issuerName           илгээгч байгууллагын нэр
+     * @param nodeHost             блокчэйний нөүдний URL
+     * @param chainId              блокчэйн ID
      */
     public PdfIssuer(
             String smartContractAddress,
@@ -32,6 +53,24 @@ public class PdfIssuer extends Issuer {
             String nodeHost,
             long chainId) {
         super(smartContractAddress, issuerAddress, issuerName, nodeHost, chainId);
+    }
+
+    /**
+     * PDF файлын хашийг ухаалаг гэрээнд бүртгэх
+     *
+     * @param smartContractAddress ухаалаг гэрээний хаяг
+     * @param issuerAddress        илгээгч байгууллагын блокчэйний хаяг
+     * @param issuerName           илгээгч байгууллагын нэр
+     * @param nodeHost             блокчэйний нөүдний URL
+     * @param okHttpClient         Custom okHttpClient
+     */
+    public PdfIssuer(
+            String smartContractAddress,
+            String issuerAddress,
+            String issuerName,
+            String nodeHost,
+            OkHttpClient okHttpClient) {
+        super(smartContractAddress, issuerAddress, issuerName, nodeHost, okHttpClient);
     }
 
     /**

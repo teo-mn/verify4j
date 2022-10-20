@@ -294,7 +294,7 @@ public abstract class Issuer {
                 throw new BlockchainNodeException("Error occurred on blockchain.");
             }
             try {
-                smartContract.addTransactionId(root, tr.getTransactionHash()).sendAsync();
+                smartContract.addTransactionId(root, tr.getTransactionHash()).send();
             } catch (Exception ignored) {
 
             }

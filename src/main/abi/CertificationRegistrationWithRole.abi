@@ -425,6 +425,25 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "childHashCount",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "creditAddress",
     "outputs": [
@@ -508,6 +527,11 @@
             "internalType": "string",
             "name": "txid",
             "type": "string"
+          },
+          {
+            "internalType": "string[]",
+            "name": "childHashes",
+            "type": "string[]"
           }
         ],
         "internalType": "struct CertificationRegistrationWithRole.Certification",
@@ -589,6 +613,11 @@
             "internalType": "string",
             "name": "txid",
             "type": "string"
+          },
+          {
+            "internalType": "string[]",
+            "name": "childHashes",
+            "type": "string[]"
           }
         ],
         "internalType": "struct CertificationRegistrationWithRole.Certification",
@@ -670,11 +699,35 @@
             "internalType": "string",
             "name": "txid",
             "type": "string"
+          },
+          {
+            "internalType": "string[]",
+            "name": "childHashes",
+            "type": "string[]"
           }
         ],
         "internalType": "struct CertificationRegistrationWithRole.Certification",
         "name": "",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
+    ],
+    "name": "getChildHashCount",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
       }
     ],
     "stateMutability": "view",
